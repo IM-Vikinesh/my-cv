@@ -6,7 +6,27 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollReveal();
     initSkillBars();
     initContactForm();
+    loadProfilePicture();
 });
+
+async function loadProfilePicture() {
+    if (typeof db === 'undefined' || !db) {
+        console.log('Firebase not configured - using default profile');
+        return;
+    }
+    
+    try {
+        const doc = await db.collection('about').doc('info').get();
+        if (doc.exists && doc.data().profilePic) {
+            const profileImg = document.querySelector('.profile-img');
+            if (profileImg) {
+                profileImg.src = doc.data().profilePic;
+            }
+        }
+    } catch (error) {
+        console.log('Error loading profile picture:', error);
+    }
+}
 
 function initHeader() {
     const header = document.getElementById('header');

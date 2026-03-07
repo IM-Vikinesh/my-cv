@@ -761,7 +761,10 @@ function updateMessageBadge() {
 }
 
 async function loadAbout() {
-    if (typeof db === 'undefined') return;
+    if (typeof db === 'undefined') {
+        console.log('Firebase not configured - using demo mode');
+        return;
+    }
 
     try {
         const doc = await db.collection('about').doc('info').get();
@@ -771,6 +774,15 @@ async function loadAbout() {
             document.getElementById('aboutEmail').value = data.email || '';
             document.getElementById('aboutPhone').value = data.phone || '';
             document.getElementById('aboutLocation').value = data.location || '';
+            document.getElementById('aboutProfilePic').value = data.profilePic || '';
+            
+            // Update preview image
+            if (data.profilePic) {
+                const previewImg = document.querySelector('#profilePreview img');
+                if (previewImg) {
+                    previewImg.src = data.profilePic;
+                }
+            }
         }
     } catch (error) {
         console.error('Error loading about:', error);
@@ -784,15 +796,32 @@ async function saveAbout(e) {
         bio: document.getElementById('aboutBio').value,
         email: document.getElementById('aboutEmail').value,
         phone: document.getElementById('aboutPhone').value,
-        location: document.getElementById('aboutLocation').value
+        location: document.getElementById('aboutLocation').value,
+        profilePic: document.getElementById('aboutProfilePic').value
     };
 
+    console.log('Saving about data:', aboutData);
+
+    if (typeof db === 'undefined') {
+        showToast('Firebase not configured!', 'error');
+        return;
+    }
+
     try {
-        await db.collection('about').doc('info').set(aboutData);
-        showToast('About section updated!', 'success');
+        await db.collection('about').doc('info').set(aboutData, { merge: true });
+        showToast('About section updated successfully!', 'success');
+        
+        // Update preview image
+        const profilePic = document.getElementById('aboutProfilePic').value;
+        if (profilePic) {
+            const previewImg = document.querySelector('#profilePreview img');
+            if (previewImg) {
+                previewImg.src = profilePic;
+            }
+        }
     } catch (error) {
         console.error('Error saving about:', error);
-        showToast('Failed to save changes', 'error');
+        showToast('Failed to save changes: ' + error.message, 'error');
     }
 }
 
