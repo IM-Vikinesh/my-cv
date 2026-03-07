@@ -8,12 +8,12 @@
 // 5. Copy your Firebase config object and replace the values below
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAeYPYs7L43y30eOyOkQZ8uMuyTZA96poM",
+    authDomain: "my-cv-f7583.firebaseapp.com",
+    projectId: "my-cv-f7583",
+    storageBucket: "my-cv-f7583.firebasestorage.app",
+    messagingSenderId: "999722595129",
+    appId: "1:999722595129:web:9eb85665f0f8ba7182eee8"
 };
 
 // Initialize Firebase
