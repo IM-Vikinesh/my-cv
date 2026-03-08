@@ -1,14 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
     initAuth();
     initNavigation();
-    initModals();
+    initFileUpload();
+    initMobileMenu();
+    initAutoSave();
+    initProfileUrlListener();
 });
 
 let currentUser = null;
-let projects = [];
-let skills = [];
-let blogs = [];
-let messages = [];
+let siteData = {
+    profile: {},
+    hero: {},
+    about: {},
+    education: [],
+    skills: [],
+    projects: [],
+    social: {},
+    messages: []
+};
+
+let autoSaveTimers = {};
+
+function initMobileMenu() {
+    const toggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
+
+    toggle?.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+}
 
 function initAuth() {
     const loginScreen = document.getElementById('loginScreen');
@@ -66,667 +95,640 @@ function initNavigation() {
     });
 }
 
-function initModals() {
-    const modal = document.getElementById('modal');
-    const modalClose = document.getElementById('modalClose');
+function initFileUpload() {
+    const fileInput = document.getElementById('profileFileInput');
+    const dropZone = document.getElementById('dropZone');
+    
+    if (!fileInput || !dropZone) return;
 
-    modalClose?.addEventListener('click', () => {
-        modal.classList.remove('active');
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
     });
 
-    modal?.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('active');
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect({ target: { files } });
         }
     });
+    
+    fileInput?.addEventListener('change', handleFileSelect);
+}
 
-    document.getElementById('addProjectBtn')?.addEventListener('click', showAddProjectModal);
-    document.getElementById('addSkillBtn')?.addEventListener('click', showAddSkillModal);
-    document.getElementById('addBlogBtn')?.addEventListener('click', showAddBlogModal);
-    document.getElementById('aboutForm')?.addEventListener('submit', saveAbout);
+async function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+        showToast('Please select an image file', 'error');
+        return;
+    }
+    
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('File size must be less than 2MB', 'error');
+        return;
+    }
+    
+    showToast('Uploading image...', 'info');
+    
+    try {
+        const storageRef = storage.ref();
+        const fileRef = storageRef.child('profile/' + Date.now() + '_' + file.name);
+        const snapshot = await fileRef.put(file);
+        const downloadURL = await snapshot.ref.getDownloadURL();
+        
+        updateProfileImage(downloadURL);
+        showToast('Image uploaded successfully!', 'success');
+    } catch (error) {
+        console.error('Upload error:', error);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            updateProfileImage(event.target.result);
+            showToast('Image loaded (local mode)', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function updateProfileImage(url) {
+    document.getElementById('profileUrl').value = url;
+    const previewImg = document.querySelector('#profilePreview img');
+    if (previewImg) {
+        previewImg.src = url;
+    }
+}
+
+function initProfileUrlListener() {
+    const urlInput = document.getElementById('profileUrl');
+    urlInput?.addEventListener('input', (e) => {
+        const url = e.target.value;
+        if (url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:'))) {
+            const previewImg = document.querySelector('#profilePreview img');
+            if (previewImg) {
+                previewImg.src = url;
+            }
+        }
+    });
+}
+
+function initAutoSave() {
+    const inputs = document.querySelectorAll('.edit-card input, .edit-card textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            clearTimeout(autoSaveTimers[input.id]);
+            autoSaveTimers[input.id] = setTimeout(() => {
+                showToast('Auto-saving...', 'info');
+                const section = input.closest('.content-section');
+                if (section) {
+                    const sectionId = section.id;
+                    if (sectionId === 'hero') saveHero();
+                    else if (sectionId === 'about') saveAbout();
+                    else if (sectionId === 'social') saveSocial();
+                }
+            }, 3000);
+        });
+    });
 }
 
 async function loadAllData() {
-    await Promise.all([
-        loadProjects(),
-        loadSkills(),
-        loadBlogs(),
-        loadMessages(),
-        loadAbout()
-    ]);
-    updateStats();
-}
-
-async function loadProjects() {
-    const grid = document.getElementById('projectsGrid');
-    
     if (typeof db === 'undefined') {
-        grid.innerHTML = '<div class="empty-state"><p>Firebase not configured. Showing demo data.</p></div>';
-        projects = getDemoProjects();
-        renderProjects();
+        showToast('Firebase not configured', 'error');
         return;
     }
-
-    try {
-        const snapshot = await db.collection('projects').orderBy('createdAt', 'desc').get();
-        projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderProjects();
-    } catch (error) {
-        console.error('Error loading projects:', error);
-        projects = getDemoProjects();
-        renderProjects();
-    }
-}
-
-function renderProjects() {
-    const grid = document.getElementById('projectsGrid');
     
-    if (projects.length === 0) {
-        grid.innerHTML = `
-            <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
-                </svg>
-                <h3>No Projects Yet</h3>
-                <p>Add your first project to get started</p>
-            </div>
-        `;
-        return;
-    }
+    try {
+        // Load all sections
+        const [profileDoc, heroDoc, aboutDoc, eduSnap, skillsSnap, projSnap, socialDoc, msgSnap] = await Promise.all([
+            db.collection('site').doc('profile').get(),
+            db.collection('site').doc('hero').get(),
+            db.collection('site').doc('about').get(),
+            db.collection('education').orderBy('order').get(),
+            db.collection('skills').orderBy('order').get(),
+            db.collection('projects').orderBy('createdAt', 'desc').get(),
+            db.collection('site').doc('social').get(),
+            db.collection('messages').orderBy('createdAt', 'desc').get()
+        ]);
 
-    grid.innerHTML = projects.map(project => `
-        <div class="item-card">
-            <div class="item-image">
-                <img src="${project.imageURL || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop'}" alt="${project.title}">
-            </div>
-            <div class="item-content">
-                <h3 class="item-title">${project.title}</h3>
-                <p class="item-description">${project.description}</p>
-                <div class="item-meta">
-                    ${(project.technologies || []).map(tech => `<span>${tech}</span>`).join('')}
-                </div>
-                <div class="item-actions">
-                    <button class="btn-edit" onclick="editProject('${project.id}')">Edit</button>
-                    <button class="btn-delete" onclick="deleteProject('${project.id}')">Delete</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+        siteData.profile = profileDoc.exists ? profileDoc.data() : {};
+        siteData.hero = heroDoc.exists ? heroDoc.data() : {};
+        siteData.about = aboutDoc.exists ? aboutDoc.data() : {};
+        siteData.education = eduSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        siteData.skills = skillsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        siteData.projects = projSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        siteData.social = socialDoc.exists ? socialDoc.data() : {};
+        siteData.messages = msgSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        populateForms();
+        renderSkills();
+        renderEducation();
+        renderProjects();
+        renderMessages();
+        updateMessageBadge();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading data', 'error');
+    }
 }
 
-function getDemoProjects() {
-    return [
-        {
-            id: '1',
-            title: 'E-Commerce Platform',
-            description: 'A full-featured online shopping platform with cart functionality.',
-            imageURL: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
-            technologies: ['React', 'Node.js', 'MongoDB'],
-            githubLink: '#',
-            liveLink: '#'
-        }
+function populateForms() {
+    // Profile
+    if (siteData.profile.profilePic) {
+        document.querySelector('#profilePreview img').src = siteData.profile.profilePic;
+        document.getElementById('profileUrl').value = siteData.profile.profilePic;
+    }
+
+    // Hero
+    document.getElementById('heroName').value = siteData.hero.name || 'S. Vikinesh';
+    document.getElementById('heroGreeting').value = siteData.hero.greeting || 'Hello, I\'m';
+    document.getElementById('heroIntro').value = siteData.hero.intro || '';
+    document.getElementById('heroRoles').value = siteData.hero.roles ? siteData.hero.roles.join(', ') : 'Web Developer, Frontend Enthusiast, Problem Solver';
+
+    // About
+    document.getElementById('aboutBio').value = siteData.about.bio || '';
+    document.getElementById('aboutEmail').value = siteData.about.email || '';
+    document.getElementById('aboutPhone').value = siteData.about.phone || '';
+    document.getElementById('aboutLocation').value = siteData.about.location || '';
+    document.getElementById('aboutExp').value = siteData.about.experience || '';
+    document.getElementById('aboutProjects').value = siteData.about.projects || '';
+    document.getElementById('aboutTech').value = siteData.about.technologies || '';
+
+    // Social
+    document.getElementById('socialGithub').value = siteData.social.github || '';
+    document.getElementById('socialLinkedin').value = siteData.social.linkedin || '';
+    document.getElementById('socialInstagram').value = siteData.social.instagram || '';
+    document.getElementById('socialFacebook').value = siteData.social.facebook || '';
+    document.getElementById('socialWhatsapp').value = siteData.social.whatsapp || '';
+    if (document.getElementById('socialTwitter')) {
+        document.getElementById('socialTwitter').value = siteData.social.twitter || '';
+    }
+    if (document.getElementById('socialYoutube')) {
+        document.getElementById('socialYoutube').value = siteData.social.youtube || '';
+    }
+    if (document.getElementById('socialStackoverflow')) {
+        document.getElementById('socialStackoverflow').value = siteData.social.stackoverflow || '';
+    }
+}
+
+// Save Functions
+async function saveProfile() {
+    const profilePic = document.getElementById('profileUrl').value;
+    
+    if (!profilePic) {
+        showToast('Please select a profile picture', 'error');
+        return;
+    }
+    
+    try {
+        await db.collection('site').doc('profile').set({ profilePic }, { merge: true });
+        showToast('Profile saved to Firebase!', 'success');
+    } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+function previewProfile() {
+    const profilePic = document.getElementById('profileUrl').value;
+    if (profilePic) {
+        window.open(profilePic, '_blank');
+    } else {
+        showToast('Please select a profile picture first', 'error');
+    }
+}
+
+async function saveHero() {
+    const heroData = {
+        name: document.getElementById('heroName').value,
+        greeting: document.getElementById('heroGreeting').value,
+        intro: document.getElementById('heroIntro').value,
+        roles: document.getElementById('heroRoles').value.split(',').map(r => r.trim()).filter(r => r)
+    };
+    
+    try {
+        await db.collection('site').doc('hero').set(heroData, { merge: true });
+        showToast('Hero section saved!', 'success');
+    } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+async function saveAbout() {
+    const aboutData = {
+        bio: document.getElementById('aboutBio').value,
+        email: document.getElementById('aboutEmail').value,
+        phone: document.getElementById('aboutPhone').value,
+        location: document.getElementById('aboutLocation').value,
+        experience: document.getElementById('aboutExp').value,
+        projects: document.getElementById('aboutProjects').value,
+        technologies: document.getElementById('aboutTech').value
+    };
+    
+    try {
+        await db.collection('site').doc('about').set(aboutData, { merge: true });
+        showToast('About section saved!', 'success');
+    } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+async function saveSocial() {
+    const socialData = {
+        github: document.getElementById('socialGithub').value,
+        linkedin: document.getElementById('socialLinkedin').value,
+        instagram: document.getElementById('socialInstagram').value,
+        facebook: document.getElementById('socialFacebook').value,
+        whatsapp: document.getElementById('socialWhatsapp').value,
+        twitter: document.getElementById('socialTwitter')?.value || '',
+        youtube: document.getElementById('socialYoutube')?.value || '',
+        stackoverflow: document.getElementById('socialStackoverflow')?.value || ''
+    };
+    
+    try {
+        await db.collection('site').doc('social').set(socialData, { merge: true });
+        showToast('Social links saved to Firebase!', 'success');
+    } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+function testSocialLinks() {
+    const links = [
+        { id: 'socialGithub', name: 'GitHub' },
+        { id: 'socialLinkedin', name: 'LinkedIn' },
+        { id: 'socialInstagram', name: 'Instagram' },
+        { id: 'socialFacebook', name: 'Facebook' },
+        { id: 'socialWhatsapp', name: 'WhatsApp' },
+        { id: 'socialTwitter', name: 'Twitter' },
+        { id: 'socialYoutube', name: 'YouTube' },
+        { id: 'socialStackoverflow', name: 'Stack Overflow' }
     ];
-}
-
-function showAddProjectModal() {
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = 'Add Project';
-    modalBody.innerHTML = `
-        <form id="projectForm">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="projectTitle" required placeholder="Project title">
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="projectDescription" required placeholder="Project description" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Image URL</label>
-                <input type="url" id="projectImage" placeholder="https://example.com/image.jpg">
-            </div>
-            <div class="form-group">
-                <label>Technologies (comma separated)</label>
-                <input type="text" id="projectTech" placeholder="React, Node.js, MongoDB">
-            </div>
-            <div class="form-group">
-                <label>GitHub Link</label>
-                <input type="url" id="projectGithub" placeholder="https://github.com/...">
-            </div>
-            <div class="form-group">
-                <label>Live Demo Link</label>
-                <input type="url" id="projectLive" placeholder="https://...">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn-submit">Add Project</button>
-            </div>
-        </form>
-    `;
-
-    document.getElementById('projectForm').addEventListener('submit', saveProject);
-    modal.classList.add('active');
-}
-
-async function saveProject(e) {
-    e.preventDefault();
-
-    const projectData = {
-        title: document.getElementById('projectTitle').value,
-        description: document.getElementById('projectDescription').value,
-        imageURL: document.getElementById('projectImage').value || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
-        technologies: document.getElementById('projectTech').value.split(',').map(t => t.trim()).filter(t => t),
-        githubLink: document.getElementById('projectGithub').value,
-        liveLink: document.getElementById('projectLive').value,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    try {
-        await db.collection('projects').add(projectData);
-        showToast('Project added successfully!', 'success');
-        closeModal();
-        await loadProjects();
-        updateStats();
-    } catch (error) {
-        console.error('Error adding project:', error);
-        showToast('Failed to add project', 'error');
-    }
-}
-
-async function editProject(id) {
-    const project = projects.find(p => p.id === id);
-    if (!project) return;
-
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = 'Edit Project';
-    modalBody.innerHTML = `
-        <form id="editProjectForm">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="editProjectTitle" required value="${project.title}">
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="editProjectDescription" required rows="3">${project.description}</textarea>
-            </div>
-            <div class="form-group">
-                <label>Image URL</label>
-                <input type="url" id="editProjectImage" value="${project.imageURL || ''}">
-            </div>
-            <div class="form-group">
-                <label>Technologies (comma separated)</label>
-                <input type="text" id="editProjectTech" value="${(project.technologies || []).join(', ')}">
-            </div>
-            <div class="form-group">
-                <label>GitHub Link</label>
-                <input type="url" id="editProjectGithub" value="${project.githubLink || ''}">
-            </div>
-            <div class="form-group">
-                <label>Live Demo Link</label>
-                <input type="url" id="editProjectLive" value="${project.liveLink || ''}">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn-submit">Save Changes</button>
-            </div>
-        </form>
-    `;
-
-    document.getElementById('editProjectForm').addEventListener('submit', (e) => updateProject(e, id));
-    modal.classList.add('active');
-}
-
-async function updateProject(e, id) {
-    e.preventDefault();
-
-    const projectData = {
-        title: document.getElementById('editProjectTitle').value,
-        description: document.getElementById('editProjectDescription').value,
-        imageURL: document.getElementById('editProjectImage').value,
-        technologies: document.getElementById('editProjectTech').value.split(',').map(t => t.trim()).filter(t => t),
-        githubLink: document.getElementById('editProjectGithub').value,
-        liveLink: document.getElementById('editProjectLive').value
-    };
-
-    try {
-        await db.collection('projects').doc(id).update(projectData);
-        showToast('Project updated successfully!', 'success');
-        closeModal();
-        await loadProjects();
-    } catch (error) {
-        console.error('Error updating project:', error);
-        showToast('Failed to update project', 'error');
-    }
-}
-
-async function deleteProject(id) {
-    if (!confirm('Are you sure you want to delete this project?')) return;
-
-    try {
-        await db.collection('projects').doc(id).delete();
-        showToast('Project deleted successfully!', 'success');
-        await loadProjects();
-        updateStats();
-    } catch (error) {
-        console.error('Error deleting project:', error);
-        showToast('Failed to delete project', 'error');
-    }
-}
-
-async function loadSkills() {
-    const list = document.getElementById('skillsList');
     
-    if (typeof db === 'undefined') {
-        skills = getDemoSkills();
-        renderSkills();
+    const validLinks = links.filter(link => {
+        const url = document.getElementById(link.id)?.value;
+        return url && (url.startsWith('http://') || url.startsWith('https://'));
+    });
+    
+    if (validLinks.length === 0) {
+        showToast('No valid links to test. Please add some social links first.', 'error');
         return;
     }
-
-    try {
-        const snapshot = await db.collection('skills').orderBy('order', 'asc').get();
-        skills = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderSkills();
-    } catch (error) {
-        console.error('Error loading skills:', error);
-        skills = getDemoSkills();
-        renderSkills();
-    }
+    
+    validLinks.forEach(link => {
+        const url = document.getElementById(link.id).value;
+        window.open(url, '_blank');
+    });
+    
+    showToast(`Opening ${validLinks.length} links in new tabs`, 'success');
 }
 
+// Skills
 function renderSkills() {
     const list = document.getElementById('skillsList');
     
-    if (skills.length === 0) {
-        list.innerHTML = `
-            <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <line x1="18" y1="20" x2="18" y2="10"/>
-                    <line x1="12" y1="20" x2="12" y2="4"/>
-                    <line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-                <h3>No Skills Yet</h3>
-                <p>Add your skills to showcase your abilities</p>
-            </div>
-        `;
+    if (siteData.skills.length === 0) {
+        list.innerHTML = '<p class="empty-text">No skills added yet</p>';
         return;
     }
 
-    list.innerHTML = skills.map(skill => `
-        <div class="skill-item">
-            <div class="skill-info">
-                <div class="skill-name">${skill.name}</div>
-                <div class="skill-bar">
-                    <div class="skill-progress" style="width: ${skill.percentage}%"></div>
-                </div>
+    list.innerHTML = siteData.skills.map(skill => `
+        <div class="simple-item">
+            <div class="simple-item-info">
+                <div class="simple-item-name">${skill.name}</div>
+                <div class="simple-item-percent">${skill.percentage}%</div>
             </div>
-            <span class="skill-percentage">${skill.percentage}%</span>
-            <div class="skill-actions">
-                <button class="btn-edit" onclick="editSkill('${skill.id}')">Edit</button>
+            <div class="simple-item-actions">
+                <input type="number" class="skill-percent-input" value="${skill.percentage}" 
+                    onchange="updateSkillPercent('${skill.id}', this.value)" min="0" max="100">
                 <button class="btn-delete" onclick="deleteSkill('${skill.id}')">Delete</button>
             </div>
         </div>
     `).join('');
 }
 
-function getDemoSkills() {
-    return [
-        { id: '1', name: 'HTML5', percentage: 95 },
-        { id: '2', name: 'CSS3', percentage: 90 },
-        { id: '3', name: 'JavaScript', percentage: 85 }
-    ];
-}
-
-function showAddSkillModal() {
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = 'Add Skill';
-    modalBody.innerHTML = `
-        <form id="skillForm">
-            <div class="form-group">
-                <label>Skill Name</label>
-                <input type="text" id="skillName" required placeholder="e.g., JavaScript">
-            </div>
-            <div class="form-group">
-                <label>Percentage (0-100)</label>
-                <input type="number" id="skillPercentage" required min="0" max="100" placeholder="85">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn-submit">Add Skill</button>
-            </div>
-        </form>
-    `;
-
-    document.getElementById('skillForm').addEventListener('submit', saveSkill);
-    modal.classList.add('active');
-}
-
-async function saveSkill(e) {
-    e.preventDefault();
-
-    const skillData = {
-        name: document.getElementById('skillName').value,
-        percentage: parseInt(document.getElementById('skillPercentage').value),
-        order: skills.length
-    };
-
+async function addSkill() {
+    const name = document.getElementById('newSkillName').value.trim();
+    const percentage = parseInt(document.getElementById('newSkillPercent').value);
+    
+    if (!name || !percentage) {
+        showToast('Please enter skill name and percentage', 'error');
+        return;
+    }
+    
     try {
-        await db.collection('skills').add(skillData);
-        showToast('Skill added successfully!', 'success');
-        closeModal();
-        await loadSkills();
-        updateStats();
+        await db.collection('skills').add({
+            name,
+            percentage,
+            order: siteData.skills.length
+        });
+        
+        document.getElementById('newSkillName').value = '';
+        document.getElementById('newSkillPercent').value = '';
+        
+        showToast('Skill added!', 'success');
+        await loadAllData();
     } catch (error) {
-        console.error('Error adding skill:', error);
-        showToast('Failed to add skill', 'error');
+        showToast('Error: ' + error.message, 'error');
     }
 }
 
-async function editSkill(id) {
-    const skill = skills.find(s => s.id === id);
-    if (!skill) return;
-
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = 'Edit Skill';
-    modalBody.innerHTML = `
-        <form id="editSkillForm">
-            <div class="form-group">
-                <label>Skill Name</label>
-                <input type="text" id="editSkillName" required value="${skill.name}">
-            </div>
-            <div class="form-group">
-                <label>Percentage (0-100)</label>
-                <input type="number" id="editSkillPercentage" required min="0" max="100" value="${skill.percentage}">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn-submit">Save Changes</button>
-            </div>
-        </form>
-    `;
-
-    document.getElementById('editSkillForm').addEventListener('submit', (e) => updateSkill(e, id));
-    modal.classList.add('active');
-}
-
-async function updateSkill(e, id) {
-    e.preventDefault();
-
-    const skillData = {
-        name: document.getElementById('editSkillName').value,
-        percentage: parseInt(document.getElementById('editSkillPercentage').value)
-    };
-
+async function updateSkillPercent(id, percent) {
     try {
-        await db.collection('skills').doc(id).update(skillData);
-        showToast('Skill updated successfully!', 'success');
-        closeModal();
-        await loadSkills();
+        await db.collection('skills').doc(id).update({ percentage: parseInt(percent) });
+        showToast('Skill updated!', 'success');
     } catch (error) {
-        console.error('Error updating skill:', error);
-        showToast('Failed to update skill', 'error');
+        showToast('Error: ' + error.message, 'error');
     }
 }
 
 async function deleteSkill(id) {
-    if (!confirm('Are you sure you want to delete this skill?')) return;
-
+    if (!confirm('Delete this skill?')) return;
+    
     try {
         await db.collection('skills').doc(id).delete();
-        showToast('Skill deleted successfully!', 'success');
-        await loadSkills();
-        updateStats();
+        showToast('Skill deleted!', 'success');
+        await loadAllData();
     } catch (error) {
-        console.error('Error deleting skill:', error);
-        showToast('Failed to delete skill', 'error');
+        showToast('Error: ' + error.message, 'error');
     }
 }
 
-async function loadBlogs() {
-    const grid = document.getElementById('blogGrid');
+// Education
+function renderEducation() {
+    const list = document.getElementById('educationList');
     
-    if (typeof db === 'undefined') {
-        blogs = getDemoBlogs();
-        renderBlogs();
+    if (siteData.education.length === 0) {
+        list.innerHTML = '<p class="empty-text">No education entries yet</p>';
         return;
     }
 
-    try {
-        const snapshot = await db.collection('blogs').orderBy('publishedAt', 'desc').get();
-        blogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderBlogs();
-    } catch (error) {
-        console.error('Error loading blogs:', error);
-        blogs = getDemoBlogs();
-        renderBlogs();
-    }
-}
-
-function renderBlogs() {
-    const grid = document.getElementById('blogGrid');
-    
-    if (blogs.length === 0) {
-        grid.innerHTML = `
-            <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                </svg>
-                <h3>No Blog Posts Yet</h3>
-                <p>Write your first blog post</p>
+    list.innerHTML = siteData.education.map(edu => `
+        <div class="list-item">
+            <div class="list-item-header">
+                <div>
+                    <div class="list-item-title">${edu.title}</div>
+                    <div class="list-item-date">${edu.date}</div>
+                </div>
+                <div class="list-item-actions">
+                    <button class="btn-edit" onclick="editEducation('${edu.id}')">Edit</button>
+                    <button class="btn-delete" onclick="deleteEducation('${edu.id}')">Delete</button>
+                </div>
             </div>
-        `;
+            <p class="list-item-desc">${edu.description}</p>
+        </div>
+    `).join('');
+}
+
+function showAddEducation() {
+    const modal = document.getElementById('modal');
+    document.getElementById('modalTitle').textContent = 'Add Education';
+    document.getElementById('modalBody').innerHTML = `
+        <form id="eduForm">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="eduTitle" required placeholder="e.g., HNDIT">
+            </div>
+            <div class="form-group">
+                <label>Date/Year</label>
+                <input type="text" id="eduDate" required placeholder="e.g., 2024 - Present">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="eduDesc" rows="3" placeholder="Description..."></textarea>
+            </div>
+            <button type="submit" class="btn-save">Add Education</button>
+        </form>
+    `;
+    
+    document.getElementById('eduForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await db.collection('education').add({
+            title: document.getElementById('eduTitle').value,
+            date: document.getElementById('eduDate').value,
+            description: document.getElementById('eduDesc').value,
+            order: siteData.education.length
+        });
+        modal.classList.remove('active');
+        showToast('Education added!', 'success');
+        await loadAllData();
+    });
+    
+    modal.classList.add('active');
+}
+
+async function editEducation(id) {
+    const edu = siteData.education.find(e => e.id === id);
+    if (!edu) return;
+    
+    const modal = document.getElementById('modal');
+    document.getElementById('modalTitle').textContent = 'Edit Education';
+    document.getElementById('modalBody').innerHTML = `
+        <form id="eduForm">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="eduTitle" required value="${edu.title}">
+            </div>
+            <div class="form-group">
+                <label>Date/Year</label>
+                <input type="text" id="eduDate" required value="${edu.date}">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="eduDesc" rows="3">${edu.description}</textarea>
+            </div>
+            <button type="submit" class="btn-save">Save Changes</button>
+        </form>
+    `;
+    
+    document.getElementById('eduForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await db.collection('education').doc(id).update({
+            title: document.getElementById('eduTitle').value,
+            date: document.getElementById('eduDate').value,
+            description: document.getElementById('eduDesc').value
+        });
+        modal.classList.remove('active');
+        showToast('Education updated!', 'success');
+        await loadAllData();
+    });
+    
+    modal.classList.add('active');
+}
+
+async function deleteEducation(id) {
+    if (!confirm('Delete this education entry?')) return;
+    
+    try {
+        await db.collection('education').doc(id).delete();
+        showToast('Education deleted!', 'success');
+        await loadAllData();
+    } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+// Projects
+function renderProjects() {
+    const grid = document.getElementById('projectsGrid');
+    
+    if (siteData.projects.length === 0) {
+        grid.innerHTML = '<p class="empty-text">No projects added yet</p>';
         return;
     }
 
-    grid.innerHTML = blogs.map(blog => `
+    grid.innerHTML = siteData.projects.map(proj => `
         <div class="item-card">
             <div class="item-image">
-                <img src="${blog.thumbnail || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=350&fit=crop'}" alt="${blog.title}">
+                <img src="${proj.imageURL || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop'}" alt="${proj.title}">
             </div>
             <div class="item-content">
-                <h3 class="item-title">${blog.title}</h3>
-                <p class="item-description">${blog.preview}</p>
+                <h3 class="item-title">${proj.title}</h3>
+                <p class="item-description">${proj.description}</p>
+                <div class="item-meta">
+                    ${(proj.technologies || []).map(t => `<span>${t}</span>`).join('')}
+                </div>
                 <div class="item-actions">
-                    <button class="btn-edit" onclick="editBlog('${blog.id}')">Edit</button>
-                    <button class="btn-delete" onclick="deleteBlog('${blog.id}')">Delete</button>
+                    <button class="btn-edit" onclick="editProject('${proj.id}')">Edit</button>
+                    <button class="btn-delete" onclick="deleteProject('${proj.id}')">Delete</button>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-function getDemoBlogs() {
-    return [
-        {
-            id: '1',
-            title: 'Getting Started with Modern Web Development',
-            preview: 'Learn the fundamentals of modern web development.',
-            thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=350&fit=crop'
-        }
-    ];
-}
-
-function showAddBlogModal() {
+function showAddProject() {
     const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = 'Add Blog Post';
-    modalBody.innerHTML = `
-        <form id="blogForm">
+    document.getElementById('modalTitle').textContent = 'Add Project';
+    document.getElementById('modalBody').innerHTML = `
+        <form id="projForm">
             <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="blogTitle" required placeholder="Blog post title">
+                <label>Project Title</label>
+                <input type="text" id="projTitle" required placeholder="Project name">
             </div>
             <div class="form-group">
-                <label>Preview Text</label>
-                <textarea id="blogPreview" required placeholder="Short preview text" rows="2"></textarea>
+                <label>Description</label>
+                <textarea id="projDesc" rows="3" placeholder="Project description"></textarea>
             </div>
             <div class="form-group">
-                <label>Thumbnail URL</label>
-                <input type="url" id="blogThumbnail" placeholder="https://example.com/image.jpg">
+                <label>Image URL</label>
+                <input type="url" id="projImage" placeholder="https://...">
             </div>
             <div class="form-group">
-                <label>Content</label>
-                <textarea id="blogContent" required placeholder="Full blog content" rows="6"></textarea>
+                <label>Technologies (comma separated)</label>
+                <input type="text" id="projTech" placeholder="React, Node.js, MongoDB">
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn-submit">Publish</button>
+            <div class="form-group">
+                <label>GitHub Link</label>
+                <input type="url" id="projGithub" placeholder="https://github.com/...">
             </div>
+            <div class="form-group">
+                <label>Live Demo Link</label>
+                <input type="url" id="projLive" placeholder="https://...">
+            </div>
+            <button type="submit" class="btn-save">Add Project</button>
         </form>
     `;
-
-    document.getElementById('blogForm').addEventListener('submit', saveBlog);
-    modal.classList.add('active');
-}
-
-async function saveBlog(e) {
-    e.preventDefault();
-
-    const blogData = {
-        title: document.getElementById('blogTitle').value,
-        preview: document.getElementById('blogPreview').value,
-        thumbnail: document.getElementById('blogThumbnail').value || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=350&fit=crop',
-        content: document.getElementById('blogContent').value,
-        publishedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    try {
-        await db.collection('blogs').add(blogData);
-        showToast('Blog post published!', 'success');
-        closeModal();
-        await loadBlogs();
-        updateStats();
-    } catch (error) {
-        console.error('Error adding blog:', error);
-        showToast('Failed to publish blog post', 'error');
-    }
-}
-
-async function editBlog(id) {
-    const blog = blogs.find(b => b.id === id);
-    if (!blog) return;
-
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = 'Edit Blog Post';
-    modalBody.innerHTML = `
-        <form id="editBlogForm">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="editBlogTitle" required value="${blog.title}">
-            </div>
-            <div class="form-group">
-                <label>Preview Text</label>
-                <textarea id="editBlogPreview" required rows="2">${blog.preview}</textarea>
-            </div>
-            <div class="form-group">
-                <label>Thumbnail URL</label>
-                <input type="url" id="editBlogThumbnail" value="${blog.thumbnail || ''}">
-            </div>
-            <div class="form-group">
-                <label>Content</label>
-                <textarea id="editBlogContent" required rows="6">${blog.content || ''}</textarea>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn-submit">Save Changes</button>
-            </div>
-        </form>
-    `;
-
-    document.getElementById('editBlogForm').addEventListener('submit', (e) => updateBlog(e, id));
-    modal.classList.add('active');
-}
-
-async function updateBlog(e, id) {
-    e.preventDefault();
-
-    const blogData = {
-        title: document.getElementById('editBlogTitle').value,
-        preview: document.getElementById('editBlogPreview').value,
-        thumbnail: document.getElementById('editBlogThumbnail').value,
-        content: document.getElementById('editBlogContent').value
-    };
-
-    try {
-        await db.collection('blogs').doc(id).update(blogData);
-        showToast('Blog post updated!', 'success');
-        closeModal();
-        await loadBlogs();
-    } catch (error) {
-        console.error('Error updating blog:', error);
-        showToast('Failed to update blog post', 'error');
-    }
-}
-
-async function deleteBlog(id) {
-    if (!confirm('Are you sure you want to delete this blog post?')) return;
-
-    try {
-        await db.collection('blogs').doc(id).delete();
-        showToast('Blog post deleted!', 'success');
-        await loadBlogs();
-        updateStats();
-    } catch (error) {
-        console.error('Error deleting blog:', error);
-        showToast('Failed to delete blog post', 'error');
-    }
-}
-
-async function loadMessages() {
-    const list = document.getElementById('messagesList');
     
-    if (typeof db === 'undefined') {
-        messages = [];
-        renderMessages();
-        return;
-    }
+    document.getElementById('projForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await db.collection('projects').add({
+            title: document.getElementById('projTitle').value,
+            description: document.getElementById('projDesc').value,
+            imageURL: document.getElementById('projImage').value || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
+            technologies: document.getElementById('projTech').value.split(',').map(t => t.trim()).filter(t => t),
+            githubLink: document.getElementById('projGithub').value,
+            liveLink: document.getElementById('projLive').value,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        modal.classList.remove('active');
+        showToast('Project added!', 'success');
+        await loadAllData();
+    });
+    
+    modal.classList.add('active');
+}
 
+async function editProject(id) {
+    const proj = siteData.projects.find(p => p.id === id);
+    if (!proj) return;
+    
+    const modal = document.getElementById('modal');
+    document.getElementById('modalTitle').textContent = 'Edit Project';
+    document.getElementById('modalBody').innerHTML = `
+        <form id="projForm">
+            <div class="form-group">
+                <label>Project Title</label>
+                <input type="text" id="projTitle" required value="${proj.title}">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="projDesc" rows="3">${proj.description}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Image URL</label>
+                <input type="url" id="projImage" value="${proj.imageURL || ''}">
+            </div>
+            <div class="form-group">
+                <label>Technologies (comma separated)</label>
+                <input type="text" id="projTech" value="${(proj.technologies || []).join(', ')}">
+            </div>
+            <div class="form-group">
+                <label>GitHub Link</label>
+                <input type="url" id="projGithub" value="${proj.githubLink || ''}">
+            </div>
+            <div class="form-group">
+                <label>Live Demo Link</label>
+                <input type="url" id="projLive" value="${proj.liveLink || ''}">
+            </div>
+            <button type="submit" class="btn-save">Save Changes</button>
+        </form>
+    `;
+    
+    document.getElementById('projForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await db.collection('projects').doc(id).update({
+            title: document.getElementById('projTitle').value,
+            description: document.getElementById('projDesc').value,
+            imageURL: document.getElementById('projImage').value,
+            technologies: document.getElementById('projTech').value.split(',').map(t => t.trim()).filter(t => t),
+            githubLink: document.getElementById('projGithub').value,
+            liveLink: document.getElementById('projLive').value
+        });
+        modal.classList.remove('active');
+        showToast('Project updated!', 'success');
+        await loadAllData();
+    });
+    
+    modal.classList.add('active');
+}
+
+async function deleteProject(id) {
+    if (!confirm('Delete this project?')) return;
+    
     try {
-        const snapshot = await db.collection('messages').orderBy('createdAt', 'desc').get();
-        messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderMessages();
-        updateMessageBadge();
+        await db.collection('projects').doc(id).delete();
+        showToast('Project deleted!', 'success');
+        await loadAllData();
     } catch (error) {
-        console.error('Error loading messages:', error);
-        messages = [];
-        renderMessages();
+        showToast('Error: ' + error.message, 'error');
     }
 }
 
+// Messages
 function renderMessages() {
     const list = document.getElementById('messagesList');
     
-    if (messages.length === 0) {
-        list.innerHTML = `
-            <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                </svg>
-                <h3>No Messages Yet</h3>
-                <p>Messages from the contact form will appear here</p>
-            </div>
-        `;
+    if (siteData.messages.length === 0) {
+        list.innerHTML = '<p class="empty-text">No messages yet</p>';
         return;
     }
 
-    list.innerHTML = messages.map(msg => `
+    list.innerHTML = siteData.messages.map(msg => `
         <div class="message-card">
             <div class="message-header">
                 <div>
@@ -746,113 +748,51 @@ function formatDate(timestamp) {
     return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: 'numeric'
     });
 }
 
 function updateMessageBadge() {
     const badge = document.getElementById('messageBadge');
     if (badge) {
-        badge.textContent = messages.length;
-        badge.style.display = messages.length > 0 ? 'inline-block' : 'none';
+        badge.textContent = siteData.messages.length;
+        badge.style.display = siteData.messages.length > 0 ? 'inline-block' : 'none';
     }
 }
 
-async function loadAbout() {
-    if (typeof db === 'undefined') {
-        console.log('Firebase not configured - using demo mode');
-        return;
-    }
-
-    try {
-        const doc = await db.collection('about').doc('info').get();
-        if (doc.exists) {
-            const data = doc.data();
-            document.getElementById('aboutBio').value = data.bio || '';
-            document.getElementById('aboutEmail').value = data.email || '';
-            document.getElementById('aboutPhone').value = data.phone || '';
-            document.getElementById('aboutLocation').value = data.location || '';
-            document.getElementById('aboutProfilePic').value = data.profilePic || '';
-            
-            // Update preview image
-            if (data.profilePic) {
-                const previewImg = document.querySelector('#profilePreview img');
-                if (previewImg) {
-                    previewImg.src = data.profilePic;
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error loading about:', error);
-    }
-}
-
-async function saveAbout(e) {
-    e.preventDefault();
-
-    const aboutData = {
-        bio: document.getElementById('aboutBio').value,
-        email: document.getElementById('aboutEmail').value,
-        phone: document.getElementById('aboutPhone').value,
-        location: document.getElementById('aboutLocation').value,
-        profilePic: document.getElementById('aboutProfilePic').value
-    };
-
-    console.log('Saving about data:', aboutData);
-
-    if (typeof db === 'undefined') {
-        showToast('Firebase not configured!', 'error');
-        return;
-    }
-
-    try {
-        await db.collection('about').doc('info').set(aboutData, { merge: true });
-        showToast('About section updated successfully!', 'success');
-        
-        // Update preview image
-        const profilePic = document.getElementById('aboutProfilePic').value;
-        if (profilePic) {
-            const previewImg = document.querySelector('#profilePreview img');
-            if (previewImg) {
-                previewImg.src = profilePic;
-            }
-        }
-    } catch (error) {
-        console.error('Error saving about:', error);
-        showToast('Failed to save changes: ' + error.message, 'error');
-    }
-}
-
-function updateStats() {
-    document.getElementById('totalProjects').textContent = projects.length;
-    document.getElementById('totalSkills').textContent = skills.length;
-    document.getElementById('totalBlogs').textContent = blogs.length;
-    document.getElementById('totalMessages').textContent = messages.length;
-}
-
-function closeModal() {
+// Modal
+document.getElementById('modalClose')?.addEventListener('click', () => {
     document.getElementById('modal').classList.remove('active');
-}
+});
 
+document.getElementById('modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'modal') {
+        document.getElementById('modal').classList.remove('active');
+    }
+});
+
+// Toast
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
-    const toastMessage = toast.querySelector('.toast-message');
-    
     toast.className = `toast ${type}`;
-    toastMessage.textContent = message;
+    toast.querySelector('.toast-message').textContent = message;
     toast.classList.add('show');
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 4000);
+    setTimeout(() => toast.classList.remove('show'), 4000);
 }
 
+// Make functions global
+window.saveProfile = saveProfile;
+window.previewProfile = previewProfile;
+window.saveHero = saveHero;
+window.saveAbout = saveAbout;
+window.saveSocial = saveSocial;
+window.testSocialLinks = testSocialLinks;
+window.addSkill = addSkill;
+window.updateSkillPercent = updateSkillPercent;
+window.deleteSkill = deleteSkill;
+window.showAddEducation = showAddEducation;
+window.editEducation = editEducation;
+window.deleteEducation = deleteEducation;
+window.showAddProject = showAddProject;
 window.editProject = editProject;
 window.deleteProject = deleteProject;
-window.editSkill = editSkill;
-window.deleteSkill = deleteSkill;
-window.editBlog = editBlog;
-window.deleteBlog = deleteBlog;
-window.closeModal = closeModal;

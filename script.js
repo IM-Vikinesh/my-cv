@@ -6,25 +6,95 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollReveal();
     initSkillBars();
     initContactForm();
-    loadProfilePicture();
+    loadSiteData();
 });
 
-async function loadProfilePicture() {
+async function loadSiteData() {
     if (typeof db === 'undefined' || !db) {
-        console.log('Firebase not configured - using default profile');
+        console.log('Firebase not configured - using default content');
         return;
     }
     
     try {
-        const doc = await db.collection('about').doc('info').get();
-        if (doc.exists && doc.data().profilePic) {
+        // Load profile
+        const profileDoc = await db.collection('site').doc('profile').get();
+        if (profileDoc.exists && profileDoc.data().profilePic) {
             const profileImg = document.querySelector('.profile-img');
-            if (profileImg) {
-                profileImg.src = doc.data().profilePic;
+            if (profileImg) profileImg.src = profileDoc.data().profilePic;
+        }
+
+        // Load hero
+        const heroDoc = await db.collection('site').doc('hero').get();
+        if (heroDoc.exists) {
+            const heroData = heroDoc.data();
+            if (heroData.name) {
+                document.querySelector('.hero-title').textContent = heroData.name;
+            }
+            if (heroData.greeting) {
+                document.querySelector('.hero-greeting').textContent = heroData.greeting;
+            }
+            if (heroData.intro) {
+                document.querySelector('.hero-intro').textContent = heroData.intro;
+            }
+            if (heroData.roles && heroData.roles.length > 0) {
+                // Update typing animation with new roles
+                window.heroRoles = heroData.roles;
             }
         }
+
+        // Load about
+        const aboutDoc = await db.collection('site').doc('about').get();
+        if (aboutDoc.exists) {
+            const aboutData = aboutDoc.data();
+            const aboutContent = document.querySelector('.about-content');
+            if (aboutContent && aboutData.bio) {
+                aboutContent.querySelector('h3').textContent = 'Passionate Web Developer';
+                aboutContent.querySelector('p').textContent = aboutData.bio;
+            }
+            if (aboutData.email) {
+                const emailLinks = document.querySelectorAll('.contact-value[href^="mailto:"]');
+                emailLinks.forEach(link => link.textContent = aboutData.email);
+            }
+            if (aboutData.phone) {
+                const phoneLinks = document.querySelectorAll('.contact-value[href^="tel:"]');
+                phoneLinks.forEach(link => {
+                    link.textContent = aboutData.phone;
+                    link.href = 'tel:' + aboutData.phone;
+                });
+            }
+            if (aboutData.location) {
+                const locationEls = document.querySelectorAll('.contact-value:not([href])');
+                locationEls.forEach(el => el.textContent = aboutData.location);
+            }
+            // Stats
+            if (aboutData.experience) {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                if (statNumbers[0]) statNumbers[0].textContent = aboutData.experience + '+';
+            }
+            if (aboutData.projects) {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                if (statNumbers[1]) statNumbers[1].textContent = aboutData.projects + '+';
+            }
+            if (aboutData.technologies) {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                if (statNumbers[2]) statNumbers[2].textContent = aboutData.technologies + '+';
+            }
+        }
+
+        // Load social links
+        const socialDoc = await db.collection('site').doc('social').get();
+        if (socialDoc.exists) {
+            const socialData = socialDoc.data();
+            const socialLinks = document.querySelectorAll('.hero-social .social-link, .footer-social a');
+            if (socialData.github && socialLinks[0]) socialLinks[0].href = socialData.github;
+            if (socialData.linkedin && socialLinks[1]) socialLinks[1].href = socialData.linkedin;
+            if (socialData.instagram && socialLinks[2]) socialLinks[2].href = socialData.instagram;
+            if (socialData.facebook && socialLinks[3]) socialLinks[3].href = socialData.facebook;
+            if (socialData.whatsapp && socialLinks[4]) socialLinks[4].href = socialData.whatsapp;
+        }
+
     } catch (error) {
-        console.log('Error loading profile picture:', error);
+        console.log('Error loading site data:', error);
     }
 }
 
@@ -91,7 +161,7 @@ function initMobileMenu() {
 
 function initTypingAnimation() {
     const typingText = document.getElementById('typingText');
-    const phrases = [
+    const phrases = window.heroRoles || [
         'Web Developer',
         'Frontend Enthusiast',
         'Problem Solver'

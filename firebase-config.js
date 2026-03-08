@@ -27,6 +27,7 @@ if (!firebase.apps.length) {
 // Initialize services
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 
 // Enable Firestore persistence (optional - enables offline support)
 // db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
