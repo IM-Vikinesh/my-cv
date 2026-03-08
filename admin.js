@@ -136,25 +136,25 @@ async function handleFileSelect(e) {
         return;
     }
     
-    showToast('Uploading image...', 'info');
+    showToast('Processing image...', 'info');
     
-    try {
-        const storageRef = storage.ref();
-        const fileRef = storageRef.child('profile/' + Date.now() + '_' + file.name);
-        const snapshot = await fileRef.put(file);
-        const downloadURL = await snapshot.ref.getDownloadURL();
-        
-        updateProfileImage(downloadURL);
-        showToast('Image uploaded successfully!', 'success');
-    } catch (error) {
-        console.error('Upload error:', error);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            updateProfileImage(event.target.result);
-            showToast('Image loaded (local mode)', 'success');
-        };
-        reader.readAsDataURL(file);
-    }
+    // Use FileReader for local preview (works without Firebase Storage)
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const dataUrl = event.target.result;
+        updateProfileImage(dataUrl);
+        // Store in localStorage for persistence
+        try {
+            localStorage.setItem('profilePic', dataUrl);
+            showToast('Profile picture updated! (Local mode)', 'success');
+        } catch (e) {
+            showToast('Image too large for local storage', 'error');
+        }
+    };
+    reader.onerror = () => {
+        showToast('Error reading file', 'error');
+    };
+    reader.readAsDataURL(file);
 }
 
 function updateProfileImage(url) {
@@ -200,6 +200,7 @@ function initAutoSave() {
 async function loadAllData() {
     if (typeof db === 'undefined') {
         showToast('Firebase not configured', 'error');
+        loadFromLocalStorage();
         return;
     }
     
@@ -225,6 +226,12 @@ async function loadAllData() {
         siteData.social = socialDoc.exists ? socialDoc.data() : {};
         siteData.messages = msgSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
+        // Also check localStorage for profile pic
+        const localProfilePic = localStorage.getItem('profilePic');
+        if (localProfilePic && !siteData.profile.profilePic) {
+            siteData.profile.profilePic = localProfilePic;
+        }
+
         populateForms();
         renderSkills();
         renderEducation();
@@ -233,8 +240,27 @@ async function loadAllData() {
         updateMessageBadge();
     } catch (error) {
         console.error('Error loading data:', error);
-        showToast('Error loading data', 'error');
+        loadFromLocalStorage();
     }
+}
+
+function loadFromLocalStorage() {
+    siteData.profile.profilePic = localStorage.getItem('profilePic') || '';
+    siteData.hero.name = localStorage.getItem('heroName') || '';
+    siteData.hero.greeting = localStorage.getItem('heroGreeting') || '';
+    siteData.hero.intro = localStorage.getItem('heroIntro') || '';
+    siteData.hero.roles = JSON.parse(localStorage.getItem('heroRoles') || '[]');
+    siteData.about.bio = localStorage.getItem('aboutBio') || '';
+    siteData.about.email = localStorage.getItem('aboutEmail') || '';
+    siteData.about.phone = localStorage.getItem('aboutPhone') || '';
+    siteData.about.location = localStorage.getItem('aboutLocation') || '';
+    siteData.about.experience = localStorage.getItem('aboutExp') || '';
+    siteData.about.projects = localStorage.getItem('aboutProjects') || '';
+    siteData.about.technologies = localStorage.getItem('aboutTech') || '';
+    siteData.social = JSON.parse(localStorage.getItem('socialLinks') || '{}');
+    
+    populateForms();
+    showToast('Loaded from local storage (offline mode)', 'info');
 }
 
 function populateForms() {
@@ -285,12 +311,25 @@ async function saveProfile() {
         return;
     }
     
+    // Always save to localStorage first
     try {
-        await db.collection('site').doc('profile').set({ profilePic }, { merge: true });
-        showToast('Profile saved to Firebase!', 'success');
-    } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+        localStorage.setItem('profilePic', profilePic);
+    } catch (e) {
+        console.warn('Could not save to localStorage:', e);
     }
+    
+    // Try Firebase if available
+    if (typeof db !== 'undefined') {
+        try {
+            await db.collection('site').doc('profile').set({ profilePic }, { merge: true });
+            showToast('Profile saved to Firebase!', 'success');
+            return;
+        } catch (error) {
+            console.warn('Firebase save failed, using local storage:', error);
+        }
+    }
+    
+    showToast('Profile saved to local storage!', 'success');
 }
 
 function previewProfile() {
@@ -310,12 +349,24 @@ async function saveHero() {
         roles: document.getElementById('heroRoles').value.split(',').map(r => r.trim()).filter(r => r)
     };
     
-    try {
-        await db.collection('site').doc('hero').set(heroData, { merge: true });
-        showToast('Hero section saved!', 'success');
-    } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+    // Save to localStorage
+    localStorage.setItem('heroName', heroData.name);
+    localStorage.setItem('heroGreeting', heroData.greeting);
+    localStorage.setItem('heroIntro', heroData.intro);
+    localStorage.setItem('heroRoles', JSON.stringify(heroData.roles));
+    
+    // Try Firebase
+    if (typeof db !== 'undefined') {
+        try {
+            await db.collection('site').doc('hero').set(heroData, { merge: true });
+            showToast('Hero section saved to Firebase!', 'success');
+            return;
+        } catch (error) {
+            console.warn('Firebase save failed:', error);
+        }
     }
+    
+    showToast('Hero section saved to local storage!', 'success');
 }
 
 async function saveAbout() {
@@ -329,12 +380,27 @@ async function saveAbout() {
         technologies: document.getElementById('aboutTech').value
     };
     
-    try {
-        await db.collection('site').doc('about').set(aboutData, { merge: true });
-        showToast('About section saved!', 'success');
-    } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+    // Save to localStorage
+    localStorage.setItem('aboutBio', aboutData.bio);
+    localStorage.setItem('aboutEmail', aboutData.email);
+    localStorage.setItem('aboutPhone', aboutData.phone);
+    localStorage.setItem('aboutLocation', aboutData.location);
+    localStorage.setItem('aboutExp', aboutData.experience);
+    localStorage.setItem('aboutProjects', aboutData.projects);
+    localStorage.setItem('aboutTech', aboutData.technologies);
+    
+    // Try Firebase
+    if (typeof db !== 'undefined') {
+        try {
+            await db.collection('site').doc('about').set(aboutData, { merge: true });
+            showToast('About section saved to Firebase!', 'success');
+            return;
+        } catch (error) {
+            console.warn('Firebase save failed:', error);
+        }
     }
+    
+    showToast('About section saved to local storage!', 'success');
 }
 
 async function saveSocial() {
@@ -349,12 +415,21 @@ async function saveSocial() {
         stackoverflow: document.getElementById('socialStackoverflow')?.value || ''
     };
     
-    try {
-        await db.collection('site').doc('social').set(socialData, { merge: true });
-        showToast('Social links saved to Firebase!', 'success');
-    } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+    // Save to localStorage as backup
+    localStorage.setItem('socialLinks', JSON.stringify(socialData));
+    
+    // Try Firebase if available
+    if (typeof db !== 'undefined') {
+        try {
+            await db.collection('site').doc('social').set(socialData, { merge: true });
+            showToast('Social links saved to Firebase!', 'success');
+            return;
+        } catch (error) {
+            console.warn('Firebase save failed:', error);
+        }
     }
+    
+    showToast('Social links saved to local storage!', 'success');
 }
 
 function testSocialLinks() {
