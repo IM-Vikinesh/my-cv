@@ -8,3 +8,12 @@ node_modules
 DEPLOY.md
 firestore.rules
 README.md
+
+# Never upload credentials: they would be served as public static files.
+*service*account*.json
+firebase-service-account*.json
+*firebase-adminsdk*.json
+*adminsdk*.json
+*credential*.json
+*.pem
+*.p12

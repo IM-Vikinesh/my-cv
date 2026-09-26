@@ -4,6 +4,12 @@ node_modules/
 !.env.example
 .vercel
 
-# Firebase service account keys must never be committed.
+# Firebase service account keys must never be committed. Match the keys Google
+# generates (…-firebase-adminsdk-….json) as well as any hand-renamed copy.
 *service*account*.json
 firebase-service-account*.json
+*firebase-adminsdk*.json
+*adminsdk*.json
+*credential*.json
+*.pem
+*.p12
