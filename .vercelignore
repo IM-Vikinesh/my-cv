@@ -6,3 +6,5 @@ node_modules
 .gitignore
 .vercel
 DEPLOY.md
+firestore.rules
+README.md
