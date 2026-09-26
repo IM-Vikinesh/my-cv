@@ -265,42 +265,101 @@
         const { useState, useEffect, useRef, useCallback, createContext, useContext } = React;
 
         // === DATA LAYER ===
+        // The admin panel used to write to localStorage, which meant every device
+        // kept its own private copy of the site. Content now lives in the server
+        // database behind /api, and localStorage is only an offline cache so the
+        // first paint is instant. The admin password is no longer in this file:
+        // /api/auth checks it against the ADMIN_TOKEN env var and hands back a
+        // signed session that is stored per-browser.
         const STORAGE_KEY = 'portfolio-data';
-        const ADMIN_KEY = 'portfolio-admin';
-        const DEFAULT_AUTH = { username: 'admin', password: 'thuva@2003' };
-        const LEGACY_AUTH = { username: 'admin', password: 'admin123' };
+        const MESSAGES_KEY = 'portfolio-messages';
+        const SESSION_KEY = 'portfolio-admin';
+
+        function lsGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
+        function lsSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
+        function lsDel(key) { try { localStorage.removeItem(key); } catch {} }
 
         function loadData() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) return JSON.parse(raw);
-            } catch {}
-            return null;
+            const raw = lsGet(STORAGE_KEY);
+            if (!raw) return null;
+            try { return JSON.parse(raw); } catch { return null; }
         }
 
-        function saveData(data) {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
-        }
+        function saveData(data) { lsSet(STORAGE_KEY, JSON.stringify(data)); }
 
         function loadAdmin() {
+            const raw = lsGet(SESSION_KEY);
+            if (!raw) return null;
             try {
-                const raw = localStorage.getItem(ADMIN_KEY);
-                if (raw) {
-                    const auth = JSON.parse(raw);
-                    // Browsers that were seeded with the old default still hold the
-                    // legacy password; upgrade them so DEFAULT_AUTH is what works.
-                    if (auth && auth.username === LEGACY_AUTH.username && auth.password === LEGACY_AUTH.password) {
-                        localStorage.setItem(ADMIN_KEY, JSON.stringify(DEFAULT_AUTH));
-                        return { ...DEFAULT_AUTH };
-                    }
-                    return auth;
-                }
-            } catch {}
-            return null;
+                const session = JSON.parse(raw);
+                if (!session || !session.token || !session.expiresAt) return null;
+                if (Date.now() > session.expiresAt) { lsDel(SESSION_KEY); return null; }
+                return session;
+            } catch { return null; }
         }
 
-        function saveAdmin(auth) {
-            try { localStorage.setItem(ADMIN_KEY, JSON.stringify(auth)); } catch {}
+        function saveAdmin(session) { lsSet(SESSION_KEY, JSON.stringify(session)); }
+
+        function getToken() { const session = loadAdmin(); return session ? session.token : null; }
+
+        // A bare "Failed to fetch" means the request never got a response, so the
+        // browser tells us nothing useful. Turn it into the likely cause instead.
+        function offlineHint() {
+            if (window.location.protocol === 'file:') {
+                return 'This page is open from your computer, not from the web. Open your Vercel address (the one ending in .vercel.app) and sign in there - the admin panel needs the online server.';
+            }
+            if (navigator.onLine === false) {
+                return 'Your device is offline. Reconnect to the internet and try again.';
+            }
+            return 'Could not reach ' + window.location.origin + '/api. Redeploy the project with the api/ folder included, and check that ADMIN_TOKEN is set in the Vercel environment variables.';
+        }
+
+        async function api(path, options) {
+            const opts = Object.assign({}, options || {});
+            opts.headers = Object.assign({}, opts.headers || {});
+            if (opts.body !== undefined && typeof opts.body !== 'string') {
+                opts.headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(opts.body);
+            }
+            const token = getToken();
+            if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+            opts.cache = 'no-store';
+            let res;
+            try {
+                res = await fetch(path, opts);
+            } catch (e) {
+                throw new Error(offlineHint());
+            }
+            let payload = null;
+            try { payload = await res.json(); } catch {}
+            if (!res.ok) {
+                const err = new Error((payload && payload.error) || ('Request failed (' + res.status + ')'));
+                err.status = res.status;
+                throw err;
+            }
+            return payload || {};
+        }
+
+        async function fetchRemoteData() {
+            const res = await api('/api/data');
+            return res.data || null;
+        }
+
+        async function pushRemoteData(data) {
+            return await api('/api/data', { method: 'PUT', body: { data: data } });
+        }
+
+        async function fetchRemoteMessages() {
+            const res = await api('/api/messages');
+            return Array.isArray(res.messages) ? res.messages : [];
+        }
+
+        async function sendRemoteMessage(message) {
+            return await api('/api/messages', { method: 'POST', body: message });
+        }
+
+        async function deleteRemoteMessage(id) {
+            return await api('/api/messages', { method: 'DELETE', body: { id: id } });
         }
 
         const DEFAULT_DATA = {
@@ -452,7 +511,6 @@
             },
             footer: {
                 note: 'Built with React & Tailwind CSS',
-                showAdminLink: true,
             },
         };
 
@@ -1124,19 +1182,30 @@
                 { icon: 'M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z', label: 'Phone', value: data.contact.phone, href: 'tel:' + data.contact.phone },
             ];
 
-            const handleSubmit = (e) => {
+            const handleSubmit = async (e) => {
                 e.preventDefault();
                 if (!form.name || !form.email || !form.message) { showToast('Please fill in required fields.', 'error'); return; }
                 setSending(true);
-                setTimeout(() => {
-                    const msgs = JSON.parse(localStorage.getItem('messages') || '[]');
-                    msgs.unshift({ ...form, createdAt: new Date().toISOString() });
-                    if (msgs.length > 50) msgs.pop();
-                    localStorage.setItem('messages', JSON.stringify(msgs));
+                const entry = { ...form, createdAt: new Date().toISOString() };
+                try {
+                    // Goes to the server so it shows up in the admin panel on every
+                    // device. The local copy is only a fallback for offline visitors.
+                    await sendRemoteMessage(entry);
+                    showToast('Message sent successfully!');
+                } catch (err) {
+                    try {
+                        const cached = JSON.parse(lsGet(MESSAGES_KEY) || '[]');
+                        cached.unshift(entry);
+                        lsSet(MESSAGES_KEY, JSON.stringify(cached.slice(0, 50)));
+                        showToast('Saved on this device only - could not reach the server.', 'error');
+                    } catch (e) {
+                        showToast('Could not send your message. Please email me directly.', 'error');
+                        return;
+                    }
+                } finally {
                     setSending(false);
                     setForm({ name: '', email: '', subject: '', message: '' });
-                    showToast('Message sent successfully!');
-                }, 1200);
+                }
             };
 
             return (
@@ -1218,9 +1287,50 @@
             );
         }
 
+        // The admin entry point is deliberately disguised: the copyright line
+        // looks like ordinary footer text and only navigates after three quick
+        // taps/clicks within ADMIN_TRIPLE_TAP_MS of each other. Keyboard users can
+        // still reach it by tabbing to the button and pressing Enter or Space.
+        const ADMIN_TRIPLE_TAP_MS = 700;
+
+        function useHiddenAdminTrigger() {
+            const taps = useRef([]);
+            const [hint, setHint] = useState(0);
+            const clear = useCallback(() => { taps.current = []; setHint(0); }, []);
+
+            useEffect(() => {
+                if (!hint) return;
+                const id = setTimeout(clear, 1800);
+                return () => clearTimeout(id);
+            }, [hint, clear]);
+
+            const onTrigger = useCallback((e) => {
+                // Ignore the trailing click of a dbl/triple-click selection.
+                if (e.detail > 1) e.preventDefault();
+                const now = Date.now();
+                taps.current = taps.current.filter(t => now - t <= ADMIN_TRIPLE_TAP_MS);
+                taps.current.push(now);
+                if (taps.current.length >= 3) {
+                    clear();
+                    window.location.hash = 'admin';
+                    return;
+                }
+                setHint(taps.current.length);
+            }, [clear]);
+
+            const onKeyDown = useCallback((e) => {
+                if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+                e.preventDefault();
+                window.location.hash = 'admin';
+            }, []);
+
+            return { onTrigger, onKeyDown, tapsLeft: Math.max(0, 3 - hint) };
+        }
+
         function Footer() {
             const { data } = useContext(DataContext);
             const p = data.profile;
+            const gate = useHiddenAdminTrigger();
             return (
                 <footer className="relative dark:bg-slate-900/50 bg-slate-100 border-t dark:border-slate-800 border-slate-200 py-10">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1232,23 +1342,30 @@
                             <div className="flex items-center gap-4">
                                 {(p.social || []).map((s, i) => (
                                     <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label}
-                                        className="w-10 h-10 rounded-xl dark:bg-slate-800 bg-slate-200 flex items-center justify-center dark:text-slate-400 text-slate-500 hover:text-primary dark:hover:bg-slate-700 hover:bg-slate-300 transition-all hover:-translate-y-1">
+                                        className="w-10 h-10 rounded-xl dark:bg-slate-800 bg-slate-200 flex items-center justify-center dark:text-slate-400 text-slate-500 hover:text-primary dark:hover:bg-slate-700 hover:text-slate-300 transition-all hover:-translate-y-1">
                                         <SocialIcon path={s.path} size={18} />
                                     </a>
                                 ))}
                             </div>
                         </div>
                         <div className="mt-8 pt-6 border-t dark:border-slate-800 border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs dark:text-slate-500 text-slate-400">
-                            <p>&copy; {new Date().getFullYear()} {p.name}. All rights reserved.</p>
+                            <p>
+                                <button type="button" onClick={gate.onTrigger} onKeyDown={gate.onKeyDown}
+                                    className="dark:text-slate-500 text-slate-400 transition-colors hover:text-primary select-none"
+                                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                                    title="Site credentials">
+                                    &copy; {new Date().getFullYear()} {p.name}. All rights reserved.
+                                </button>
+                            </p>
                             <p className="flex items-center gap-1">
                                 {(data.footer && data.footer.note) ? <span>{(data.footer && data.footer.note)} &middot; </span> : null}
-                                {data.footer && data.footer.showAdminLink === false ? null : <a href="#admin" className="hover:text-primary transition-colors">Admin</a>}
                             </p>
                         </div>
                     </div>
                 </footer>
             );
         }
+
 
         // === ADMIN COMPONENTS ===
 
@@ -1397,16 +1514,24 @@
             const [u, setU] = useState('');
             const [p, setP] = useState('');
             const [err, setErr] = useState('');
+            const [busy, setBusy] = useState(false);
 
-            useEffect(() => {
-                if (!loadAdmin()) { saveAdmin({ ...DEFAULT_AUTH }); }
-            }, []);
-
-            const handle = (e) => {
+            const handle = async (e) => {
                 e.preventDefault();
-                const auth = loadAdmin() || { ...DEFAULT_AUTH };
-                if (u === auth.username && p === auth.password) { onLogin(); }
-                else { setErr('Invalid username or password'); }
+                setErr('');
+                setBusy(true);
+                try {
+                    const session = await api('/api/auth', {
+                        method: 'POST',
+                        body: { username: u.trim(), password: p }
+                    });
+                    saveAdmin(session);
+                    onLogin();
+                } catch (ex) {
+                    setErr(ex.message || 'Sign in failed.');
+                } finally {
+                    setBusy(false);
+                }
             };
             return (
                 <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4">
@@ -1416,14 +1541,16 @@
                             <p className="text-slate-400 text-sm mt-1">Sign in to manage your portfolio</p>
                         </div>
                         <form onSubmit={handle} className="space-y-4">
-                            {err && <div className="text-red-400 text-sm bg-red-400/10 px-4 py-2 rounded-lg">{err}</div>}
+                            {err && <div className="text-red-400 text-sm bg-red-400/10 px-4 py-2 rounded-lg break-words">{err}</div>}
                             <input type="text" placeholder="Username" value={u} onChange={e => setU(e.target.value)} required
+                                autoComplete="username"
                                 className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
                             <input type="password" placeholder="Password" value={p} onChange={e => setP(e.target.value)} required
+                                autoComplete="current-password"
                                 className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
-                            <button type="submit"
-                                className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all">
-                                Sign In
+                            <button type="submit" disabled={busy}
+                                className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60">
+                                {busy ? 'Signing in...' : 'Sign In'}
                             </button>
                         </form>
                         <div className="mt-6 text-center">
@@ -1437,7 +1564,7 @@
             );
         }
 
-        function AdminDashboard({ onLogout }) {
+        function AdminDashboard({ onLogout, sync }) {
             const { data, updateData } = useContext(DataContext);
             const [section, setSection] = useState('profile');
             const sidebarItems = [
@@ -1464,6 +1591,7 @@
                     <div className="px-3 py-3 mb-2">
                         <h3 className="font-heading font-bold text-white text-lg">Admin</h3>
                         <p className="text-xs text-slate-400">Portfolio Manager</p>
+                        <div className="mt-2 pt-2 border-t border-slate-700/50"><SyncBadge sync={sync} /></div>
                     </div>
                     {sidebarItems.map(s => (
                         <button key={s.id} onClick={() => setSection(s.id)}
@@ -1514,6 +1642,9 @@
                     <div className="hidden lg:block">{sidebar}</div>
                     <div className="flex-1 min-w-0 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
                         <div className="glass rounded-2xl p-4 sm:p-6">
+                            <div className="lg:hidden flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-700/50">
+                                <SyncBadge sync={sync} />
+                            </div>
                             <div className="lg:hidden flex gap-2 mb-4 overflow-x-auto pb-2">
                                 {sidebarItems.map(s => (
                                     <button key={s.id} onClick={() => setSection(s.id)}
@@ -2320,7 +2451,7 @@
                 blurb: c.blurb || '',
                 showForm: c.showForm !== false,
             });
-            const [footer, setFooter] = useState({ note: f.note || '', showAdminLink: f.showAdminLink !== false });
+            const [footer, setFooter] = useState({ note: f.note || '' });
 
             useEffect(() => {
                 const cc = data.contact || {};
@@ -2330,7 +2461,7 @@
                     location: cc.location || pp.location || '', blurb: cc.blurb || '',
                     showForm: cc.showForm !== false,
                 });
-                setFooter({ note: (data.footer || {}).note || '', showAdminLink: (data.footer || {}).showAdminLink !== false });
+                setFooter({ note: (data.footer || {}).note || '' });
             }, [data.contact, data.profile, data.footer]);
 
             const set = (k) => (v) => setForm(s => ({ ...s, [k]: v }));
@@ -2373,8 +2504,6 @@
                             <AdminField label="Footer Note" hint="Small text at the bottom. Leave blank to hide.">
                                         <AdminInput value={footer.note} onChange={v => setFooter(s => ({ ...s, note: v }))} />
                             </AdminField>
-                            <AdminToggle label="Show Admin link in footer" checked={footer.showAdminLink}
-                                onChange={v => setFooter(s => ({ ...s, showAdminLink: v }))} />
                         </div>
                     </div>
                 </div>
@@ -2573,36 +2702,86 @@
         }
 
         function AdminMessages() {
-            const [msgs, setMsgs] = useState(() => {
-                try { return JSON.parse(localStorage.getItem('messages') || '[]'); } catch { return []; }
-            });
-            const del = (idx) => {
-                const next = msgs.filter((_, i) => i !== idx);
+            const [msgs, setMsgs] = useState([]);
+            const [status, setStatus] = useState('loading');
+            const [note, setNote] = useState('');
+
+            const load = useCallback(async () => {
+                setStatus('loading');
+                try {
+                    const remote = await fetchRemoteMessages();
+                    // One-time rescue for messages that were only ever saved in the
+                    // browser that received them, before the server existed.
+                    const stranded = (() => { try { return JSON.parse(lsGet(MESSAGES_KEY) || '[]'); } catch { return []; } })();
+                    if (stranded.length && !remote.some(r => r && r.createdAt && stranded.some(s => s.createdAt === r.createdAt))) {
+                        const unsent = stranded.filter(s => !remote.some(r => r.createdAt === s.createdAt));
+                        if (unsent.length) {
+                            await sendRemoteMessage(unsent);
+                            setNote('Moved ' + unsent.length + ' message(s) from this browser into the shared inbox.');
+                            const again = await fetchRemoteMessages();
+                            setMsgs(again);
+                            lsSet(MESSAGES_KEY, '[]');
+                            setStatus('ok');
+                            return;
+                        }
+                    }
+                    setMsgs(remote);
+                    setStatus('ok');
+                } catch (err) {
+                    setNote(err.message || 'Could not load messages.');
+                    setStatus('err');
+                }
+            }, []);
+
+            useEffect(() => { load(); }, [load]);
+
+            const del = async (m) => {
+                const next = msgs.filter(x => x.id !== m.id);
                 setMsgs(next);
-                try { localStorage.setItem('messages', JSON.stringify(next)); } catch {}
-                showToast('Message deleted!');
+                try {
+                    await deleteRemoteMessage(m.id);
+                    showToast('Message deleted!');
+                } catch (err) {
+                    setNote(err.message);
+                    load();
+                }
             };
-            const clearAll = () => {
+            const clearAll = async () => {
                 if (!confirm('Delete all messages?')) return;
                 setMsgs([]);
-                try { localStorage.setItem('messages', '[]'); } catch {}
-                showToast('All messages cleared!');
+                lsSet(MESSAGES_KEY, '[]');
+                try {
+                    await api('/api/messages', { method: 'DELETE', body: { all: true } });
+                    showToast('All messages cleared!');
+                } catch (err) {
+                    setNote(err.message);
+                    load();
+                }
             };
             return (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="font-heading text-xl font-bold text-white">Messages</h2>
-                        {msgs.length > 0 && (
-                            <button onClick={clearAll}
-                                className="px-4 py-2 rounded-xl text-xs font-medium bg-red-500/20 text-red-400">
-                                Clear All
-                            </button>
-                        )}
+                        <div className="flex items-center gap-3">
+                            <button onClick={load}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/60 text-slate-300 hover:text-white transition-all">Refresh</button>
+                            {msgs.length > 0 && (
+                                <button onClick={clearAll}
+                                    className="px-4 py-2 rounded-xl text-xs font-medium bg-red-500/20 text-red-400">
+                                    Clear All
+                                </button>
+                            )}
+                        </div>
                     </div>
-                    {msgs.length === 0 && <p className="text-sm text-slate-400">No messages yet. Contact form submissions will appear here.</p>}
+                    {note && <p className="text-xs text-amber-400 bg-amber-400/10 px-3 py-2 rounded-lg break-words">{note}</p>}
+                    {status === 'loading' && <p className="text-sm text-slate-400">Loading messages...</p>}
+                    {status === 'ok' && msgs.length === 0 && <p className="text-sm text-slate-400">No messages yet. Contact form submissions will appear here.</p>}
+                    {status === 'err' && msgs.length === 0 && (
+                        <p className="text-sm text-slate-400">Could not reach the message store. Messages you sent from this device are still saved below.</p>
+                    )}
                     <div className="space-y-3">
                         {msgs.map((m, i) => (
-                            <div key={i} className="glass rounded-xl p-4" style={{background:'rgba(255,255,255,0.03)'}}>
+                            <div key={m.id || i} className="glass rounded-xl p-4" style={{background:'rgba(255,255,255,0.03)'}}>
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-3 flex-wrap">
@@ -2613,8 +2792,8 @@
                                         <p className="text-sm text-slate-300 mt-2">{m.message}</p>
                                         <p className="text-xs text-slate-500 mt-2">{m.createdAt ? new Date(m.createdAt).toLocaleString() : ''}</p>
                                     </div>
-                                    <button onClick={() => del(i)}
-                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all flex-shrink-0">Delete</button>
+                                    <button onClick={() => del(m)} disabled={m.id === undefined}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all flex-shrink-0 disabled:opacity-40">Delete</button>
                                 </div>
                             </div>
                         ))}
@@ -2787,18 +2966,16 @@
             };
 
             const clearOverride = () => {
-                if (!confirm('Clear the data saved in this browser? The site will fall back to the defaults baked into the file.')) return;
-                try {
-                    localStorage.removeItem(STORAGE_KEY);
-                    localStorage.removeItem('portfolio-theme');
-                } catch {}
+                if (!confirm('Clear the copy cached in this browser? The site will re-download the shared content from the server.')) return;
+                lsDel(STORAGE_KEY);
+                lsDel('portfolio-theme');
                 window.location.reload();
             };
 
             const resetDefaults = () => {
                 if (!confirm('Reset every section back to the original defaults? This cannot be undone.')) return;
                 updateData(DEFAULT_DATA);
-                setStatus({ type: 'ok', text: 'All sections reset to defaults. Download the file to make it permanent.' });
+                setStatus({ type: 'ok', text: 'All sections reset to defaults and saved to the server.' });
                 showToast('Reset to defaults!');
             };
 
@@ -2814,7 +2991,7 @@
 
             return (
                 <div className="space-y-6">
-                    <AdminHeading title="Backup & Export" subtitle="Your edits live in this browser only. Save them somewhere safe." />
+                    <AdminHeading title="Backup & Export" subtitle="Your edits are saved to the server, so every device shows the same site. Export a JSON copy to keep somewhere safe." />
 
                     <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
                         <h3 className="font-heading text-base font-semibold text-white mb-1">Current Contents</h3>
@@ -2886,59 +3063,71 @@
         }
 
         function AdminSettings() {
-            const [auth, setAuth] = useState(loadAdmin() || { ...DEFAULT_AUTH });
-            const [f, setF] = useState({ username: auth.username, password: '', confirm: '' });
-            const [msg, setMsg] = useState('');
-            const saveAuth = () => {
-                if (f.password && f.password !== f.confirm) { setMsg('Passwords do not match.'); return; }
-                if (!f.username.trim()) { setMsg('Username cannot be empty.'); return; }
-                if (f.password && f.password.length < 6) { setMsg('Use at least 6 characters.'); return; }
-                const updated = { username: f.username.trim(), password: f.password || auth.password };
-                setAuth(updated);
-                saveAdmin(updated);
-                setF({ ...f, password: '', confirm: '' });
-                setMsg('');
-                showToast('Credentials updated!');
-            };
+            const session = loadAdmin();
+
             return (
                 <div className="space-y-6">
-                    <AdminHeading title="Settings" subtitle="Admin sign-in credentials" />
+                    <AdminHeading title="Settings" subtitle="How the admin panel is secured" />
                     <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
-                        <h3 className="font-heading text-base font-semibold text-white mb-4">Admin Credentials</h3>
-                        {msg && <p className="text-red-400 text-sm mb-3">{msg}</p>}
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <AdminField label="Username">
-                                <AdminInput value={f.username} onChange={v => setF(s => ({ ...s, username: v }))} />
-                            </AdminField>
-                            <AdminField label="New Password" hint="Leave blank to keep current.">
-                                <AdminInput type="password" value={f.password} onChange={v => setF(s => ({ ...s, password: v }))} />
-                            </AdminField>
-                            <AdminField label="Confirm Password">
-                                <AdminInput type="password" value={f.confirm} onChange={v => setF(s => ({ ...s, confirm: v }))} />
-                            </AdminField>
-                        </div>
-                        <div className="mt-4">
-                            <AdminSaveButton onClick={saveAuth} label="Update Credentials" />
-                        </div>
-                        <p className="text-[11px] text-slate-500 mt-4">
-                            Credentials are stored in this browser only. Anyone with the file can still read them, so keep them private and
-                            change them if the site is published.
+                        <h3 className="font-heading text-base font-semibold text-white mb-2">Signed in as</h3>
+                        <p className="text-sm text-slate-400">
+                            <span className="text-white font-medium">{session ? session.username : 'unknown'}</span>
+                            {session && <> &middot; session valid until {new Date(session.expiresAt).toLocaleString()}</>}
+                        </p>
+                        <p className="text-[11px] text-slate-500 mt-3">
+                            The password is no longer stored in this page. It is checked by the server against an environment variable,
+                            so visitors cannot read it by viewing the source.
                         </p>
                     </div>
                     <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
-                        <h3 className="font-heading text-base font-semibold text-white mb-2">About the Admin Panel</h3>
+                        <h3 className="font-heading text-base font-semibold text-white mb-2">Changing the password</h3>
+                        <ol className="text-sm text-slate-400 space-y-2 list-decimal list-inside">
+                            <li>Open your project in Vercel &rarr; <span className="text-slate-300">Settings &rarr; Environment Variables</span>.</li>
+                            <li>Update <span className="font-mono text-slate-300">ADMIN_TOKEN</span> (the password) and optionally <span className="font-mono text-slate-300">ADMIN_USER</span> (defaults to <span className="font-mono text-slate-300">admin</span>).</li>
+                            <li>Redeploy. Every device will need to sign in again.</li>
+                        </ol>
+                    </div>
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-2">How to open this panel</h3>
                         <p className="text-sm text-slate-400">
-                            Open the panel at <span className="font-mono text-slate-300">index.html#admin</span>. The default sign-in is
-                            <span className="font-mono text-slate-300"> admin / thuva@2003</span> &mdash; change it here before publishing.
+                            There is no Admin link on the site. Triple tap (or triple click) the
+                            copyright line at the bottom of the page to sign in. Typing
+                            <span className="font-mono text-slate-300"> #admin</span> at the end of the URL works too.
                         </p>
                     </div>
                 </div>
             );
         }
 
-        function PublicPortfolio() {
+        // Tells the user whether what they are looking at is the shared copy or a
+        // local fallback, so a failed save is never silent.
+        const SYNC_TONES = {
+            loading: { dot: 'bg-slate-400', text: 'text-slate-400' },
+            saving: { dot: 'bg-amber-400 animate-pulse', text: 'text-amber-300' },
+            ok: { dot: 'bg-emerald-400', text: 'text-emerald-300' },
+            empty: { dot: 'bg-sky-400', text: 'text-sky-300' },
+            error: { dot: 'bg-red-400', text: 'text-red-300' },
+            local: { dot: 'bg-amber-400', text: 'text-amber-300' },
+        };
+
+        function SyncBadge({ sync }) {
+            const tone = SYNC_TONES[(sync && sync.state) || 'loading'] || SYNC_TONES.loading;
+            return (
+                <div className={'flex items-center gap-2 text-[11px] font-medium ' + tone.text}>
+                    <span className={'w-2 h-2 rounded-full ' + tone.dot} />
+                    <span className="break-words">{(sync && sync.message) || ''}</span>
+                </div>
+            );
+        }
+
+        function PublicPortfolio({ sync }) {
             return (
                 <div className="relative">
+                    {sync && sync.state === 'local' && (
+                        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 max-w-[90vw] px-4 py-2 rounded-xl text-xs bg-amber-500/15 text-amber-200 border border-amber-500/30 backdrop-blur">
+                            {(sync.message || 'Offline') + ' - showing the copy cached in this browser'}
+                        </div>
+                    )}
                     <Navbar />
                     <Hero />
                     <About />
@@ -2961,12 +3150,95 @@
             });
             const [page, setPage] = useState('portfolio');
             const [dataVersion, setDataVersion] = useState(0);
+            const [sync, setSync] = useState({ state: 'loading', message: 'Connecting...' });
+            const [remoteStamp, setRemoteStamp] = useState(null);
+            const pushingRef = useRef(false);
+            const pushTimer = useRef(null);
+
+            // Writes are debounced so dragging a slider or typing in a field does
+            // not fire a request per keystroke.
+            const schedulePush = useCallback((newData) => {
+                if (!getToken()) {
+                    setSync({ state: 'local', message: 'Sign in to save to the server' });
+                    return;
+                }
+                if (pushTimer.current) clearTimeout(pushTimer.current);
+                setSync(s => (s.state === 'local' ? s : { state: 'saving', message: 'Saving...' }));
+                pushTimer.current = setTimeout(async () => {
+                    pushTimer.current = null;
+                    pushingRef.current = true;
+                    try {
+                        const res = await pushRemoteData(newData);
+                        setRemoteStamp((res && res.updatedAt) || new Date().toISOString());
+                        setSync({ state: 'ok', message: 'Saved - live everywhere' });
+                    } catch (err) {
+                        setSync({ state: 'error', message: 'Not saved: ' + (err.message || 'network error') });
+                    } finally {
+                        pushingRef.current = false;
+                    }
+                }, 700);
+            }, []);
 
             const updateData = useCallback((newData) => {
                 setDataState(newData);
                 saveData(newData);
                 setDataVersion(v => v + 1);
-            }, []);
+                schedulePush(newData);
+            }, [schedulePush]);
+
+            // Pull the shared copy once on boot. The localStorage cache renders
+            // instantly, then gets replaced by the server version when it arrives.
+            useEffect(() => {
+                let cancelled = false;
+                (async () => {
+                    try {
+                        const res = await fetch('/api/data', { cache: 'no-store' });
+                        if (!res.ok) throw new Error('sync unavailable');
+                        const payload = await res.json();
+                        if (cancelled) return;
+                        if (payload && payload.data) {
+                            const merged = deepMerge(DEFAULT_DATA, payload.data);
+                            setDataState(merged);
+                            saveData(merged);
+                            setRemoteStamp(payload.updatedAt || null);
+                            setSync({ state: 'ok', message: 'Live - shared across devices' });
+                        } else {
+                            // Nothing stored yet: publish whatever this browser knows
+                            // so the very first save is not lost.
+                            setSync({ state: 'empty', message: 'No shared copy yet' });
+                            if (getToken()) schedulePush(getData());
+                        }
+                    } catch (e) {
+                        if (cancelled) return;
+                        setSync({ state: 'local', message: offlineHint() });
+                    }
+                })();
+                return () => { cancelled = true; };
+            }, [schedulePush]);
+
+            // Another device (or another tab) saved something: adopt it.
+            useEffect(() => {
+                if (page !== 'portfolio') return;
+                let stop = false;
+                const poll = async () => {
+                    if (stop || document.hidden || pushTimer.current || pushingRef.current) return;
+                    try {
+                        const res = await fetch('/api/data', { cache: 'no-store' });
+                        if (!res.ok) return;
+                        const payload = await res.json();
+                        if (stop || !payload || !payload.data || !payload.updatedAt) return;
+                        if (remoteStamp && payload.updatedAt === remoteStamp) return;
+                        setRemoteStamp(payload.updatedAt);
+                        const merged = deepMerge(DEFAULT_DATA, payload.data);
+                        setDataState(merged);
+                        saveData(merged);
+                        setDataVersion(v => v + 1);
+                    } catch (e) { /* offline; try again on the next tick */ }
+                };
+                const id = setInterval(poll, 20000);
+                document.addEventListener('visibilitychange', poll);
+                return () => { stop = true; clearInterval(id); document.removeEventListener('visibilitychange', poll); };
+            }, [page, remoteStamp]);
 
             useEffect(() => {
                 const root = document.documentElement;
@@ -3034,7 +3306,7 @@
 
             const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), []);
             const handleLogin = () => { window.location.hash = 'admin/dashboard'; };
-            const handleLogout = () => { window.location.hash = ''; };
+            const handleLogout = () => { lsDel(SESSION_KEY); window.location.hash = ''; };
 
             useScrollProgress();
             useParticles();
@@ -3043,8 +3315,8 @@
                 <ThemeContext.Provider value={{ theme, toggleTheme }}>
                     <DataContext.Provider value={{ data, updateData }}>
                         {page === 'admin-login' && <AdminLogin onLogin={handleLogin} />}
-                        {page === 'admin-dashboard' && <AdminDashboard onLogout={handleLogout} />}
-                        {page === 'portfolio' && <PublicPortfolio />}
+                        {page === 'admin-dashboard' && <AdminDashboard onLogout={handleLogout} sync={sync} />}
+                        {page === 'portfolio' && <PublicPortfolio sync={sync} />}
                     </DataContext.Provider>
                 </ThemeContext.Provider>
             );
