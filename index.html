@@ -304,6 +304,8 @@
 
         // A bare "Failed to fetch" means the request never got a response, so the
         // browser tells us nothing useful. Turn it into the likely cause instead.
+        // Only reached when fetch itself rejects: if the server did answer with an
+        // error status we show the server's own message instead.
         function offlineHint() {
             if (window.location.protocol === 'file:') {
                 return 'This page is open from your computer, not from the web. Open your Vercel address (the one ending in .vercel.app) and sign in there - the admin panel needs the online server.';
@@ -311,7 +313,24 @@
             if (navigator.onLine === false) {
                 return 'Your device is offline. Reconnect to the internet and try again.';
             }
-            return 'Could not reach ' + window.location.origin + '/api. Redeploy the project with the api/ folder included, and check that ADMIN_TOKEN is set in the Vercel environment variables.';
+            return 'Could not reach ' + window.location.origin + '/api. Check your internet connection.';
+        }
+
+        // Plain unauthenticated read used by the boot hydration and the poll.
+        // Distinguishes "the network failed" from "the server said no".
+        async function apiRead(path) {
+            let res;
+            try {
+                res = await fetch(path, { cache: 'no-store' });
+            } catch (e) {
+                throw new Error(offlineHint());
+            }
+            let payload = null;
+            try { payload = await res.json(); } catch {}
+            if (!res.ok) {
+                throw new Error((payload && payload.error) || ('The server returned an error (' + res.status + ').'));
+            }
+            return payload || {};
         }
 
         async function api(path, options) {
@@ -3192,9 +3211,7 @@
                 let cancelled = false;
                 (async () => {
                     try {
-                        const res = await fetch('/api/data', { cache: 'no-store' });
-                        if (!res.ok) throw new Error('sync unavailable');
-                        const payload = await res.json();
+                        const payload = await apiRead('/api/data');
                         if (cancelled) return;
                         if (payload && payload.data) {
                             const merged = deepMerge(DEFAULT_DATA, payload.data);
@@ -3210,7 +3227,7 @@
                         }
                     } catch (e) {
                         if (cancelled) return;
-                        setSync({ state: 'local', message: offlineHint() });
+                        setSync({ state: 'local', message: e.message || offlineHint() });
                     }
                 })();
                 return () => { cancelled = true; };
@@ -3223,9 +3240,7 @@
                 const poll = async () => {
                     if (stop || document.hidden || pushTimer.current || pushingRef.current) return;
                     try {
-                        const res = await fetch('/api/data', { cache: 'no-store' });
-                        if (!res.ok) return;
-                        const payload = await res.json();
+                        const payload = await apiRead('/api/data');
                         if (stop || !payload || !payload.data || !payload.updatedAt) return;
                         if (remoteStamp && payload.updatedAt === remoteStamp) return;
                         setRemoteStamp(payload.updatedAt);
@@ -3233,7 +3248,7 @@
                         setDataState(merged);
                         saveData(merged);
                         setDataVersion(v => v + 1);
-                    } catch (e) { /* offline; try again on the next tick */ }
+                    } catch (e) { /* offline, or server not ready; try again next tick */ }
                 };
                 const id = setInterval(poll, 20000);
                 document.addEventListener('visibilitychange', poll);
