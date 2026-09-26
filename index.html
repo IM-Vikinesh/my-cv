@@ -1,0 +1,3045 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S. Vikinesh | Aspiring Software Engineer</title>
+    <meta name="description" content="Portfolio of S. Vikinesh – Aspiring Software Engineer, Full-Stack Developer & AI Enthusiast. HNDIT student at ATI Sri Lanka." />
+    <meta name="keywords" content="S. Vikinesh, software engineer, portfolio, full-stack developer, AI, React, Sri Lanka" />
+    <meta property="og:title" content="S. Vikinesh | Aspiring Software Engineer" />
+    <meta property="og:description" content="Building Intelligent Solutions for the Future" />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+    <link id="fontBodyLink" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link id="fontHeadingLink" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Space Grotesk', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#06B6D4',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        shimmer: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --secondary: #8B5CF6;
+            --accent: #06B6D4;
+            --bg-dark: #0F172A;
+            --text-light: #F8FAFC;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #3B82F6; border-radius: 3px; }
+        ::selection { background: #3B82F6; color: #fff; }
+        .dark body { background: #0F172A; color: #F8FAFC; }
+
+        /* Scroll progress bar */
+        #scrollProgress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #06B6D4);
+            z-index: 9999; transition: width 0.1s;
+        }
+
+        /* Particle canvas */
+        #particleCanvas {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+        }
+
+        /* Typing cursor blink */
+        @keyframes blink { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
+        .cursor-blink { animation: blink 1s step-end infinite; }
+
+        /* Scroll reveal */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Glassmorphism base */
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+        }
+        .dark .glass-light {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.12);
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Skill bar animation */
+        .skill-progress-fill {
+            transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6, #06B6D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Button glow */
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-glow::before {
+            content: '';
+            position: absolute; inset: -2px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6, #06B6D4, #3B82F6);
+            background-size: 300% 300%;
+            border-radius: inherit;
+            z-index: -1;
+            animation: gradientShift 3s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        @keyframes gradientShift {
+            0%,100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Nav link active */
+        .nav-link.active {
+            color: #3B82F6;
+        }
+        .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: #3B82F6;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Light mode overrides */
+        :root.light body, .light body { background: #f8fafc; color: #0f172a; }
+        .light .glass { background: rgba(255,255,255,0.7); border-color: rgba(59,130,246,0.2); }
+        .light .glass-card { background: rgba(255,255,255,0.8); border-color: rgba(59,130,246,0.15); }
+        .light .glass-card:hover { box-shadow: 0 12px 40px rgba(59,130,246,0.1); }
+        .light ::-webkit-scrollbar-track { background: #f1f5f9; }
+
+        /* Focus styles for accessibility */
+        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid #3B82F6; outline-offset: 2px;
+        }
+
+        /* Loading screen */
+        #loadingScreen {
+            position: fixed; inset: 0; z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+            background: #0F172A; transition: opacity 0.6s, visibility 0.6s;
+        }
+        #loadingScreen.hidden { opacity: 0; visibility: hidden; }
+        .loader { width: 48px; height: 48px; border: 3px solid rgba(59,130,246,0.2); border-top-color: #3B82F6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+            padding: 1rem 1.5rem; border-radius: 12px;
+            transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+            max-width: 400px;
+        }
+        .toast.show { transform: translateX(0); }
+        @media (max-width: 640px) { .toast { left: 1rem; right: 1rem; } }
+
+        /* Responsive timeline */
+        .timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; transform: translateX(-50%); }
+        @media (max-width: 768px) { .timeline-line { left: 20px; } }
+
+        /* Gradient border card */
+        .gradient-border {
+            position: relative;
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute; inset: 0; border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.5), rgba(139,92,246,0.3), rgba(6,182,212,0.5));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="dark:bg-[#0F172A] bg-slate-50 dark:text-[#F8FAFC] text-slate-900 font-body transition-colors duration-300">
+
+    <div id="loadingScreen">
+        <div class="loader"></div>
+        <p class="mt-4 text-sm text-slate-400" id="loadingMsg">Loading...</p>
+    </div>
+    <div id="errorScreen" style="display:none;position:fixed;inset:0;z-index:9999;background:#0F172A;color:#F8FAFC;padding:2rem;font-family:monospace;overflow:auto;">
+        <h2 style="color:#ef4444;margin-bottom:1rem;">Something went wrong</h2>
+        <pre id="errorMsg" style="color:#94a3b8;white-space:pre-wrap;"></pre>
+    </div>
+
+    <div id="scrollProgress"></div>
+    <canvas id="particleCanvas"></canvas>
+    <div id="root"></div>
+    <div id="toast" class="toast glass-card"></div>
+
+    <script>
+        // Auto-hide loading screen after timeout (in case React fails to mount)
+        setTimeout(function() {
+            var ls = document.getElementById('loadingScreen');
+            if (ls && !ls.classList.contains('hidden')) {
+                ls.classList.add('hidden');
+                document.getElementById('loadingMsg').textContent = 'Taking longer than expected — check your internet connection and reload.';
+            }
+        }, 12000);
+        // Global error handler
+        window.onerror = function(msg, url, line, col, err) {
+            var es = document.getElementById('errorScreen');
+            var em = document.getElementById('errorMsg');
+            if (es && em) {
+                em.textContent = (err && err.stack) || msg + ' (at ' + url + ':' + line + ':' + col + ')';
+                es.style.display = 'flex';
+                es.style.alignItems = 'center';
+                es.style.justifyContent = 'center';
+                es.style.flexDirection = 'column';
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.22.12/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback, createContext, useContext } = React;
+
+        // === DATA LAYER ===
+        const STORAGE_KEY = 'portfolio-data';
+        const ADMIN_KEY = 'portfolio-admin';
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch {}
+            return null;
+        }
+
+        function saveData(data) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+        }
+
+        function loadAdmin() {
+            try {
+                const raw = localStorage.getItem(ADMIN_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch {}
+            return null;
+        }
+
+        function saveAdmin(auth) {
+            try { localStorage.setItem(ADMIN_KEY, JSON.stringify(auth)); } catch {}
+        }
+
+        const DEFAULT_DATA = {
+            site: {
+                title: 'S. Vikinesh | Aspiring Software Engineer',
+                description: 'Portfolio of S. Vikinesh \u2013 Aspiring Software Engineer, Full-Stack Developer & AI Enthusiast. HNDIT student at ATI Sri Lanka.',
+                keywords: 'S. Vikinesh, software engineer, portfolio, full-stack developer, AI, React, Sri Lanka',
+                ogTitle: 'S. Vikinesh | Aspiring Software Engineer',
+                ogDescription: 'Building Intelligent Solutions for the Future',
+                accent: '#06B6D4',
+            },
+            theme: {
+                primary: '#3B82F6',
+                secondary: '#8B5CF6',
+                accent: '#06B6D4',
+                headingFont: 'Space Grotesk',
+                bodyFont: 'Inter',
+                defaultMode: 'dark',
+            },
+            hero: {
+                greeting: "Hi, I'm",
+                viewProjectsLabel: 'View Projects',
+                contactLabel: 'Contact Me',
+                resumeLabel: 'Resume',
+                resumeUrl: '',
+                showScrollHint: true,
+            },
+            nav: {
+                items: ['Home', 'About', 'Skills', 'Projects', 'Education', 'Achievements', 'Contact'],
+                ctaLabel: 'Hire Me',
+                ctaTarget: 'contact',
+            },
+            profile: {
+                name: 'S. Vikinesh',
+                tagline: 'Aspiring Software Engineer',
+                image: 'IMG_20260221_164230.jpg',
+                available: true,
+                status: 'Available for Internships',
+                about: [
+                    'I am S. Vikinesh, an HNDIT student at ATI Sri Lanka with a strong passion for software development, artificial intelligence, cloud computing, and quality assurance. I enjoy transforming ideas into practical applications through modern technologies.',
+                    'My goal is to become a skilled Software Engineer specializing in AI-powered systems and cloud-based solutions. I continuously improve my skills through academic projects, research activities, and hands-on development.'
+                ],
+                email: 'vikinesh@example.com',
+                phone: '+1 234 567 890',
+                location: 'Sri Lanka',
+                social: [
+                    { label: 'GitHub', url: 'https://github.com', path: 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z' },
+                    { label: 'LinkedIn', url: 'https://linkedin.com', path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z' },
+                    { label: 'Email', url: 'mailto:vikinesh@example.com', path: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22,6l-10,7L2,6' },
+                ],
+                typingWords: ['Aspiring Software Engineer', 'Full-Stack Developer', 'AI Enthusiast', 'Problem Solver'],
+                heroDescription: 'Building Intelligent Solutions for the Future. Passionate Software Engineering student specializing in Full-Stack Development, Artificial Intelligence, and Cloud Technologies.',
+            },
+            interests: ['Full Stack Development', 'Artificial Intelligence', 'Cloud Engineering', 'Software Testing', 'Automation', 'Database Systems'],
+            stats: [
+                { value: '2+', label: 'Years Learning', icon: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
+                { value: '10+', label: 'Projects Built', icon: 'M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z' },
+                { value: '5+', label: 'Tech Stacks', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4' },
+            ],
+            skills: [
+                { name: 'Programming Languages', items: [
+                    { name: 'Java', pct: 85 }, { name: 'JavaScript', pct: 80 }, { name: 'Python', pct: 80 }, { name: 'SQL', pct: 85 },
+                ]},
+                { name: 'Frontend', items: [
+                    { name: 'HTML5', pct: 90 }, { name: 'CSS3', pct: 85 }, { name: 'Bootstrap', pct: 85 }, { name: 'React', pct: 80 },
+                ]},
+                { name: 'Backend & Database', items: [
+                    { name: 'Flask', pct: 80 }, { name: 'Node.js', pct: 75 }, { name: 'MySQL', pct: 85 }, { name: 'Firebase', pct: 80 },
+                ]},
+                { name: 'Tools & Cloud', items: [
+                    { name: 'Git', pct: 80 }, { name: 'GitHub', pct: 85 }, { name: 'Postman', pct: 80 }, { name: 'Selenium', pct: 80 },
+                ]},
+            ],
+            projects: [
+                {
+                    title: 'JobNex AI',
+                    subtitle: 'AI-Powered Job Portal',
+                    desc: 'An intelligent job portal that provides CV analysis, ATS simulation, AI career guidance, personalized job recommendations, and resume building features.',
+                    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
+                    tags: ['React', 'Flask', 'MySQL', 'Firebase', 'Gemini API'],
+                    features: ['CV Analyzer', 'ATS Simulation', 'AI Career Assistant', 'Resume Builder'],
+                    github: '#', live: '#',
+                    status: 'In Development',
+                },
+                {
+                    title: 'Automation Testing Framework',
+                    subtitle: 'Selenium + TestNG',
+                    desc: 'A Selenium-based automation testing framework implementing the Page Object Model design pattern for automated web testing with detailed reporting.',
+                    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
+                    tags: ['Java', 'Selenium', 'TestNG', 'Maven', 'Extent Reports'],
+                    features: ['Automated Testing', 'Page Object Model', 'Cross Browser', 'Extent Reporting'],
+                    github: '#', live: '#',
+                    status: 'Completed',
+                },
+                {
+                    title: 'IT Industry Skills Research',
+                    subtitle: 'Sri Lankan IT Industry Analysis',
+                    desc: 'A research study conducted to identify technical skills, soft skills, tools, and technologies required by the Sri Lankan IT industry.',
+                    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop',
+                    tags: ['Research', 'Data Analysis', 'Visualization'],
+                    features: ['Industry Survey', 'Statistical Analysis', 'Visualization Reports'],
+                    github: '#', live: '#',
+                    status: 'Completed',
+                },
+            ],
+            education: [
+                {
+                    period: '2024 - Present',
+                    title: 'Higher National Diploma in Information Technology (HNDIT)',
+                    institution: 'ATI Sri Lanka',
+                    desc: 'Specializing in Software Engineering, Database Systems, Web Development, and Software Testing.',
+                    highlights: ['Software Engineering', 'Database Systems', 'Web Development', 'Software Testing', 'Networking', 'Project Management'],
+                },
+                {
+                    period: '2020 - 2022',
+                    title: 'Advanced Level - Technology Stream',
+                    institution: 'Secondary Education',
+                    desc: 'Completed Advanced Level in Technology stream, focusing on ICT and Engineering principles.',
+                },
+                {
+                    period: '2019',
+                    title: 'Ordinary Level',
+                    institution: 'Secondary Education',
+                    desc: 'Completed Secondary Education with excellent results in Mathematics and Science subjects.',
+                },
+            ],
+            achievements: [
+                { title: 'JobNex AI - Final Year Project', desc: 'Developed an AI-powered job portal with CV analysis, ATS simulation, and career guidance features.', icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                { title: 'Automation Testing Framework', desc: 'Built a Selenium-based automation framework with Page Object Model, cross-browser support, and Extent Reports.', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4' },
+                { title: 'IT Industry Skills Research', desc: 'Conducted a comprehensive research study on technical skills and tools required by the Sri Lankan IT industry.', icon: 'M9 12h6M12 9v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5l5 5v11a2 2 0 01-2 2z' },
+                { title: 'Continuous Learning', desc: 'Actively expanding skills in cloud technologies (AWS), AI/ML, and modern software development practices.', icon: 'M12 2l9 4.5v9L12 20l-9-4.5v-9L12 2zm0 3.5L5.5 9 12 12.5 18.5 9 12 5.5zM12 12.5V20' },
+            ],
+            sections: {
+                about: { eyebrow: 'About Me', title: 'Get to Know Me' },
+                skills: { eyebrow: 'Expertise', title: 'Technical Skills' },
+                projects: { eyebrow: 'Portfolio', title: 'Featured Projects' },
+                education: { eyebrow: 'Education', title: 'Academic Journey' },
+                achievements: { eyebrow: 'Milestones', title: 'Achievements' },
+                contact: { eyebrow: 'Contact', title: 'Get In Touch' },
+                interests: { eyebrow: '', title: 'Areas of Interest' },
+                contactCard: { title: "Let's Talk", body: 'Feel free to reach out for opportunities, collaborations, or just to connect. I\u2019m always open to discussing new projects and ideas.' },
+            },
+            contact: {
+                email: 'vikinesh@example.com',
+                phone: '+94 75 600 9798',
+                location: 'Sri Lanka',
+                blurb: 'Feel free to reach out for opportunities, collaborations, or just to connect. I\u2019m always open to discussing new projects and ideas.',
+                showForm: true,
+            },
+            footer: {
+                note: 'Built with React & Tailwind CSS',
+                showAdminLink: true,
+            },
+        };
+
+
+        function deepMerge(base, over) {
+            if (over === undefined || over === null) return base;
+            if (Array.isArray(base) || Array.isArray(over)) return over;
+            if (typeof base !== 'object' || typeof over !== 'object') return over;
+            const out = Object.assign({}, base);
+            Object.keys(over).forEach(function (k) { out[k] = deepMerge(base[k], over[k]); });
+            return out;
+        }
+
+        function getData() {
+            return deepMerge(DEFAULT_DATA, loadData());
+        }
+
+        // === SOCIAL ICON LIBRARY ===
+        // Each entry is SVG inner markup rendered as a stroked outline icon,
+        // except github / linkedin / mail which reuse solid brand paths.
+        const SOCIAL_ICONS = {
+            github: { label: 'GitHub', svg: 'M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2.1c-3.2.7-3.88-1.37-3.88-1.37-.52-1.34-1.28-1.7-1.28-1.7-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z' },
+            linkedin: { label: 'LinkedIn', svg: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.063 2.063 0 1 1 0-4.126 2.063 2.063 0 0 1 0 4.126zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z' },
+            mail: { label: 'Email', svg: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22,6l-10,7L2,6' },
+            website: { label: 'Website', svg: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/>' },
+            phone: { label: 'Phone', svg: '<path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>' },
+            location: { label: 'Location', svg: '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>' },
+            x: { label: 'X (Twitter)', svg: 'M17.53 3h3.05l-6.66 7.61L21.75 21h-5.9l-4.62-6.04L5.94 21H2.89l7.12-8.14L2.25 3h6.05l4.18 5.52 5.05-5.52zm-1.07 16.15h1.69L7.62 4.76H5.8l10.66 14.39z' },
+            instagram: { label: 'Instagram', svg: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>' },
+            youtube: { label: 'YouTube', svg: '<rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.2l5 2.8-5 2.8z"/>' },
+            facebook: { label: 'Facebook', svg: '<path d="M15.5 3h-2.2A4.8 4.8 0 0 0 8.5 7.8V10H5.5v3.5h3V21h3.5v-7.5H15l.6-3.5h-3.6V8.2c0-.7.5-1.2 1.2-1.2h2.3V3z"/>' },
+            telegram: { label: 'Telegram', svg: '<path d="M21 4L3 11.2l4.6 1.6L9.4 19l3.2-3 4.4 3.2L21 4z"/><path d="M7.6 12.8 20 5"/>' },
+            whatsapp: { label: 'WhatsApp', svg: '<path d="M3 21l1.7-5.1A8.6 8.6 0 1 1 8 19.3L3 21z"/><path d="M9 8.5c0 3 2.5 5.5 5.5 5.5"/>' },
+            dribbble: { label: 'Dribbble', svg: '<circle cx="12" cy="12" r="9"/><path d="M5 8.2c4.6 1.4 9.4 1 12.8-1.4M3.6 13.9c5.2-2 11.2-1 14.7 3.1M9.2 3.6c3.8 4.4 5.9 9 6.4 16.2"/>' },
+            discord: { label: 'Discord', svg: '<path d="M9.2 5.6A11 11 0 0 1 12 5.4a11 11 0 0 1 2.8.2c1.9 2.2 3 5.4 3 9.4-1.3 1.2-3 2-3 2l-.8-1.3a8.6 8.6 0 0 1-4 0L9.2 17s-1.7-.8-3-2c0-4 1.1-7.2 3-9.4z"/><circle cx="9.6" cy="12.6" r="1.1"/><circle cx="14.4" cy="12.6" r="1.1"/>' },
+            stackoverflow: { label: 'Stack Overflow', svg: '<path d="M8 15.5V10M12 16.5V6.5M16 15.5V9M4 20h16"/>' },
+            behance: { label: 'Behance', svg: '<path d="M2.5 5.5h4.2a2.7 2.7 0 0 1 0 5.4H2.5zM2.5 10.9h4.7a2.7 2.7 0 0 1 0 5.4H2.5z"/><path d="M13 10.6a3.4 3.4 0 1 1 6.8 0zM14 14.2h6.2a3.1 3.1 0 0 1-6.2 0"/><path d="M15 7.2h4.5"/>' },
+        };
+
+        const SOCIAL_ICON_KEYS = Object.keys(SOCIAL_ICONS);
+
+        // === CONTEXTS ===
+        const ThemeContext = createContext();
+        function useTheme() { return useContext(ThemeContext); }
+        const DataContext = createContext();
+
+        // === UTILITY ===
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast glass-card show ' + (type === 'error' ? '!border-red-500 !bg-red-500/10' : '!border-emerald-500 !bg-emerald-500/10');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        // Renders a social entry. `path` may be a plain SVG `d` string (solid,
+        // legacy format) or full SVG inner markup (outlined library format).
+        function SocialIcon({ path, size = 18, strokeWidth = 1.7 }) {
+            const raw = path || '';
+            if (String(raw).trim().charAt(0) === '<') {
+                return (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
+                        dangerouslySetInnerHTML={{ __html: raw }} />
+                );
+            }
+            return (
+                <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d={raw} />
+                </svg>
+            );
+        }
+
+        // Section heading block, driven entirely by data.sections
+        function SectionHead({ sectionKey, data, center = true }) {
+            const s = (data.sections && data.sections[sectionKey]) || {};
+            return (
+                <div className={center ? 'text-center mb-16 reveal' : 'mb-10 reveal'}>
+                    {s.eyebrow && (
+                        <span className="inline-block text-xs font-semibold tracking-widest uppercase dark:text-primary text-primary/70 mb-3">{s.eyebrow}</span>
+                    )}
+                    <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold">{s.title}</h2>
+                    <div className="mt-3 w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto"></div>
+                </div>
+            );
+        }
+
+        // === CUSTOM HOOKS ===
+        function useScrollReveal() {
+            useEffect(() => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+                return () => observer.disconnect();
+            }, []);
+        }
+
+        function useTypingAnimation(words, typingSpeed=80, deletingSpeed=40, pauseTime=2000) {
+            const [text, setText] = useState('');
+            const [isDeleting, setIsDeleting] = useState(false);
+            const [wordIdx, setWordIdx] = useState(0);
+
+            useEffect(() => {
+                const current = words[wordIdx] || '';
+                let timeout;
+                if (!isDeleting) {
+                    if (text.length < current.length) {
+                        timeout = setTimeout(() => setText(current.slice(0, text.length + 1)), typingSpeed);
+                    } else {
+                        timeout = setTimeout(() => setIsDeleting(true), pauseTime);
+                    }
+                } else {
+                    if (text.length > 0) {
+                        timeout = setTimeout(() => setText(text.slice(0, -1)), deletingSpeed);
+                    } else {
+                        setIsDeleting(false);
+                        setWordIdx((wordIdx + 1) % words.length);
+                    }
+                }
+                return () => clearTimeout(timeout);
+            }, [text, isDeleting, wordIdx, words, typingSpeed, deletingSpeed, pauseTime]);
+
+            return text;
+        }
+
+        function useScrollProgress() {
+            useEffect(() => {
+                const bar = document.getElementById('scrollProgress');
+                const handler = () => {
+                    const h = document.documentElement.scrollHeight - window.innerHeight;
+                    bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+                };
+                window.addEventListener('scroll', handler);
+                return () => window.removeEventListener('scroll', handler);
+            }, []);
+        }
+
+        function useParticles() {
+            useEffect(() => {
+                const canvas = document.getElementById('particleCanvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                let animId;
+                const particles = [];
+                const count = 60;
+
+                function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+                resize();
+                window.addEventListener('resize', resize);
+
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        r: Math.random() * 2 + 1,
+                    });
+                }
+
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const isDark = document.documentElement.classList.contains('dark');
+                    particles.forEach((p, i) => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < 0) p.x = canvas.width;
+                        if (p.x > canvas.width) p.x = 0;
+                        if (p.y < 0) p.y = canvas.height;
+                        if (p.y > canvas.height) p.y = 0;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fillStyle = isDark ? 'rgba(59,130,246,0.3)' : 'rgba(59,130,246,0.15)';
+                        ctx.fill();
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = p.x - particles[j].x, dy = p.y - particles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 150) {
+                                ctx.beginPath();
+                                ctx.moveTo(p.x, p.y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.strokeStyle = isDark ? `rgba(59,130,246,${0.15 * (1 - dist / 150)})` : `rgba(59,130,246,${0.08 * (1 - dist / 150)})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.stroke();
+                            }
+                        }
+                    });
+                    animId = requestAnimationFrame(draw);
+                }
+                draw();
+                return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
+            }, []);
+        }
+
+        // === COMPONENTS ===
+
+        function Navbar() {
+            const { theme, toggleTheme } = useTheme();
+            const { data } = useContext(DataContext);
+            const [scrolled, setScrolled] = useState(false);
+            const [mobileOpen, setMobileOpen] = useState(false);
+            const [activeSection, setActiveSection] = useState('home');
+            const navCfg = data.nav || {};
+            const navItems = navCfg.items && navCfg.items.length ? navCfg.items : ['Home', 'About', 'Skills', 'Projects', 'Education', 'Achievements', 'Contact'];
+
+            useEffect(() => {
+                const onScroll = () => {
+                    setScrolled(window.scrollY > 50);
+                    const sections = document.querySelectorAll('section[id]');
+                    let current = 'home';
+                    sections.forEach(s => {
+                        if (window.scrollY >= s.offsetTop - 150) current = s.id;
+                    });
+                    setActiveSection(current);
+                };
+                window.addEventListener('scroll', onScroll);
+                return () => window.removeEventListener('scroll', onScroll);
+            }, []);
+
+            const scrollTo = (id) => {
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                setMobileOpen(false);
+            };
+
+            const isDark = theme === 'dark';
+            const logoSrc = data.profile.image || 'IMG_20260221_164230.jpg';
+
+            return (
+                <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'dark:bg-[#0F172A]/90 bg-white/90 backdrop-blur-xl shadow-lg dark:shadow-slate-900/50' : 'bg-transparent'}`}>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-16 lg:h-20">
+                            <button onClick={() => scrollTo('home')} className="flex items-center gap-3 group">
+                                <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-colors">
+                                    <img src={logoSrc} alt="SV" className="w-full h-full object-cover" />
+                                </div>
+                                <span className="font-heading font-bold text-lg gradient-text">{data.profile.name}</span>
+                            </button>
+
+                            <div className="hidden lg:flex items-center gap-1">
+                                {navItems.map(item => {
+                                    const id = item.toLowerCase();
+                                    return (
+                                        <button key={item} onClick={() => scrollTo(id)}
+                                            className={`nav-link relative px-3 py-2 text-sm font-medium transition-colors rounded-lg ${activeSection === id ? 'active text-primary' : 'dark:text-slate-300 text-slate-600 hover:text-primary dark:hover:text-primary'}`}>
+                                            {item}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button onClick={toggleTheme}
+                                    className="w-10 h-10 rounded-xl dark:bg-slate-800/50 bg-slate-200 flex items-center justify-center dark:text-yellow-400 text-slate-600 hover:scale-110 transition-transform"
+                                    aria-label="Toggle theme">
+                                    {isDark ?
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                                    :
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                                    }
+                                </button>
+
+                                <a href={'#' + (navCfg.ctaTarget || 'contact')} onClick={(e) => { e.preventDefault(); scrollTo(navCfg.ctaTarget || 'contact'); }}
+                                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    {navCfg.ctaLabel || 'Hire Me'}
+                                </a>
+
+                                <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden w-10 h-10 rounded-xl dark:bg-slate-800/50 bg-slate-200 flex items-center justify-center dark:text-white text-slate-700" aria-label="Menu">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        {mobileOpen ?
+                                            <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+                                        :
+                                            <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
+                                        }
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile menu */}
+                    <div className={`lg:hidden transition-all duration-300 overflow-hidden ${mobileOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className="dark:bg-[#0F172A]/95 bg-white/95 backdrop-blur-xl border-t dark:border-slate-800 border-slate-200 px-4 py-3 space-y-1">
+                            {navItems.map(item => {
+                                const id = item.toLowerCase();
+                                return (
+                                    <button key={item} onClick={() => scrollTo(id)}
+                                        className={`block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeSection === id ? 'dark:bg-primary/20 bg-primary/10 text-primary' : 'dark:text-slate-300 text-slate-600 hover:dark:bg-slate-800/50 hover:bg-slate-100'}`}>
+                                        {item}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </nav>
+            );
+        }
+
+        function Hero() {
+            const { data } = useContext(DataContext);
+            const p = data.profile;
+            const h = data.hero || {};
+            const typingText = useTypingAnimation(p.typingWords || [p.tagline, 'Full-Stack Developer', 'AI Enthusiast', 'Problem Solver']);
+            const [loaded, setLoaded] = useState(false);
+            const heroStat = (data.stats || [])[0] || { value: '', label: '' };
+
+            useEffect(() => {
+                document.getElementById('loadingScreen')?.classList.add('hidden');
+                setTimeout(() => setLoaded(true), 100);
+            }, []);
+
+            return (
+                <section id="home" className="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute inset-0 dark:bg-gradient-to-b dark:from-primary/5 dark:via-transparent dark:to-transparent bg-gradient-to-b from-primary/5 via-transparent to-transparent"></div>
+                        <div className="absolute top-1/4 -left-32 w-96 h-96 dark:bg-primary/10 bg-primary/5 rounded-full blur-3xl"></div>
+                        <div className="absolute bottom-1/4 -right-32 w-96 h-96 dark:bg-secondary/10 bg-secondary/5 rounded-full blur-3xl"></div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+                        <div className="grid lg:grid-cols-2 gap-12 items-center">
+                            <div className={`space-y-6 transition-all duration-1000 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                                {p.status && (
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full dark:bg-primary/10 bg-primary/5 dark:text-primary text-primary text-sm font-medium border dark:border-primary/20 border-primary/10">
+                                        <span className={'w-2 h-2 rounded-full ' + (p.available ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400')}></span>
+                                        {p.status}
+                                    </div>
+                                )}
+
+                                <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                                    {h.greeting ? <>{h.greeting}{' '}</> : null}
+                                    <span className="gradient-text">{p.name}</span>
+                                </h1>
+
+                                <div className="flex items-center gap-2 text-xl sm:text-2xl dark:text-slate-300 text-slate-600 min-h-[2.5rem]">
+                                    <span>{typingText}</span>
+                                    <span className="cursor-blink text-primary">|</span>
+                                </div>
+
+                                <p className="text-base sm:text-lg dark:text-slate-400 text-slate-500 max-w-xl leading-relaxed">
+                                    {p.heroDescription || 'Building Intelligent Solutions for the Future. Passionate Software Engineering student specializing in Full-Stack Development, Artificial Intelligence, and Cloud Technologies.'}
+                                </p>
+
+                                <div className="flex flex-wrap gap-4 pt-2">
+                                    <button onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+                                        className="btn-glow inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary relative z-10">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                                        {h.viewProjectsLabel || 'View Projects'}
+                                    </button>
+                                    <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold dark:border-slate-700 border-slate-300 border-2 dark:text-white text-slate-800 hover:dark:bg-white/5 hover:bg-slate-100 transition-all">
+                                        {h.contactLabel || 'Contact Me'}
+                                    </button>
+                                    {h.resumeLabel && (h.resumeUrl ? (
+                                        <a href={h.resumeUrl} target="_blank" rel="noopener noreferrer" download
+                                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold dark:bg-slate-800/50 bg-slate-200 dark:text-slate-300 text-slate-600 hover:dark:bg-slate-700/50 hover:bg-slate-300 transition-all">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            {h.resumeLabel}
+                                        </a>
+                                    ) : (
+                                        <button onClick={() => showToast('Resume download will be available soon.')}
+                                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold dark:bg-slate-800/50 bg-slate-200 dark:text-slate-300 text-slate-600 hover:dark:bg-slate-700/50 hover:bg-slate-300 transition-all">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            {h.resumeLabel}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="flex items-center gap-4 pt-4">
+                                    {(p.social || []).map((s, i) => (
+                                        <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+                                            className="w-11 h-11 rounded-xl dark:bg-slate-800/50 bg-white dark:border-slate-700 border-slate-300 border flex items-center justify-center dark:text-slate-400 text-slate-500 hover:text-primary hover:border-primary dark:hover:border-primary transition-all hover:-translate-y-1">
+                                            <SocialIcon path={s.path} size={20} />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className={`hidden lg:flex justify-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                                <div className="relative">
+                                    <div className="w-72 h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10 animate-float">
+                                        <img src={p.image || 'IMG_20260221_164230.jpg'} alt={p.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    {heroStat.value && (
+                                        <div className="absolute -bottom-4 -right-4 w-24 h-24 rounded-xl dark:bg-primary/20 bg-primary/10 backdrop-blur-xl border dark:border-primary/30 border-primary/20 flex items-center justify-center">
+                                            <div className="text-center px-1">
+                                                <div className="text-2xl font-bold font-heading gradient-text">{heroStat.value}</div>
+                                                <div className="text-[10px] dark:text-slate-400 text-slate-500 font-medium leading-tight">{heroStat.label}</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="absolute -top-4 -left-4 w-20 h-20 rounded-xl dark:bg-secondary/20 bg-secondary/10 backdrop-blur-xl border dark:border-secondary/30 border-secondary/20 flex items-center justify-center">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-secondary"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {h.showScrollHint !== false && (
+                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="dark:text-slate-500 text-slate-400"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+                        </div>
+                    )}
+                </section>
+            );
+        }
+
+        function About() {
+            const { data } = useContext(DataContext);
+            const p = data.profile;
+            useScrollReveal();
+            return (
+                <section id="about" className="relative py-20 lg:py-28">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <SectionHead sectionKey="about" data={data} />
+
+                        <div className="grid lg:grid-cols-5 gap-10 items-start">
+                            <div className="lg:col-span-3 reveal space-y-5">
+                                <div className="glass-card rounded-2xl p-6 sm:p-8">
+                                    {(p.about || ['']).map((para, i) => (
+                                        <p key={i} className={'dark:text-slate-300 text-slate-600 leading-relaxed text-base sm:text-lg' + (i > 0 ? ' mt-4' : '')}>{para}</p>
+                                    ))}
+                                </div>
+
+                                <div className="glass-card rounded-2xl p-6 sm:p-8">
+                                    <h3 className="font-heading text-lg font-semibold mb-4 dark:text-white text-slate-900">{(data.sections && data.sections.interests && data.sections.interests.title) || 'Areas of Interest'}</h3>
+                                    <div className="flex flex-wrap gap-3">
+                                        {(data.interests || []).map((item, i) => (
+                                            <span key={i} className="px-4 py-2 rounded-xl text-sm font-medium dark:bg-primary/10 bg-primary/5 dark:text-primary text-primary/80 border dark:border-primary/20 border-primary/10">
+                                                {item}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-2 reveal space-y-4">
+                                {(data.stats || []).map((s, i) => (
+                                    <div key={i} className="glass-card rounded-2xl p-5 flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl dark:bg-primary/10 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary"><path d={s.icon}/></svg>
+                                        </div>
+                                        <div>
+                                            <div className="text-2xl font-bold font-heading gradient-text">{s.value}</div>
+                                            <div className="text-sm dark:text-slate-400 text-slate-500">{s.label}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function Skills() {
+            const { data } = useContext(DataContext);
+            useScrollReveal();
+            const categories = data.skills || [];
+
+            return (
+                <section id="skills" className="relative py-20 lg:py-28 dark:bg-slate-900/30 bg-slate-100/50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <SectionHead sectionKey="skills" data={data} />
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {categories.map((cat, ci) => (
+                                <div key={ci} className="glass-card rounded-2xl p-6 reveal">
+                                    <h3 className="font-heading text-lg font-semibold mb-5 dark:text-white text-slate-900 flex items-center gap-2">
+                                        <span className="w-1.5 h-5 rounded-full bg-gradient-to-b from-primary to-secondary inline-block"></span>
+                                        {cat.name}
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {cat.items.map((skill, si) => (
+                                            <SkillBar key={si} name={skill.name} percentage={skill.pct} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function SkillBar({ name, percentage }) {
+            const [visible, setVisible] = useState(false);
+            const ref = useRef();
+
+            useEffect(() => {
+                const el = ref.current;
+                if (!el) return;
+                const obs = new IntersectionObserver(([e]) => {
+                    if (e.isIntersecting) { setVisible(true); obs.unobserve(e.target); }
+                }, { threshold: 0.3 });
+                obs.observe(el);
+                return () => obs.disconnect();
+            }, []);
+
+            return (
+                <div ref={ref}>
+                    <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-sm font-medium dark:text-slate-300 text-slate-600">{name}</span>
+                        <span className="text-xs font-mono dark:text-primary text-primary/80">{percentage}%</span>
+                    </div>
+                    <div className="h-2 rounded-full dark:bg-slate-700/50 bg-slate-200 overflow-hidden">
+                        <div className="skill-progress-fill h-full rounded-full bg-gradient-to-r from-primary via-secondary to-accent"
+                            style={{ width: visible ? percentage + '%' : '0%' }}>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function Projects() {
+            const { data } = useContext(DataContext);
+            useScrollReveal();
+            const projects = data.projects || [];
+
+            return (
+                <section id="projects" className="relative py-20 lg:py-28">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <SectionHead sectionKey="projects" data={data} />
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {projects.map((p, i) => (
+                                <div key={i} className="glass-card rounded-2xl overflow-hidden group reveal flex flex-col">
+                                    <div className="relative h-48 overflow-hidden">
+                                        <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        <div className="absolute inset-0 dark:bg-gradient-to-t dark:from-[#0F172A] from-white via-transparent to-transparent"></div>
+                                        <div className="absolute top-3 right-3">
+                                            <span className={`text-xs font-semibold px-3 py-1 rounded-full ${p.status === 'In Development' ? 'dark:bg-yellow-500/20 bg-yellow-100 text-yellow-600 dark:text-yellow-400' : 'dark:bg-emerald-500/20 bg-emerald-100 text-emerald-600 dark:text-emerald-400'}`}>
+                                                {p.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="p-5 flex flex-col flex-1">
+                                        <span className="text-xs dark:text-primary text-primary/80 font-medium uppercase tracking-wider">{p.subtitle}</span>
+                                        <h3 className="font-heading text-lg font-bold mt-1 mb-2 dark:text-white text-slate-900">{p.title}</h3>
+                                        <p className="text-sm dark:text-slate-400 text-slate-500 leading-relaxed mb-4 flex-1">{p.desc}</p>
+                                        <div className="flex flex-wrap gap-1.5 mb-4">
+                                            {p.tags.map((t, ti) => (
+                                                <span key={ti} className="px-2.5 py-1 text-[11px] font-mono font-medium dark:bg-slate-800 bg-slate-100 dark:text-slate-300 text-slate-600 rounded-md">{t}</span>
+                                            ))}
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {p.features.map((f, fi) => (
+                                                <span key={fi} className="text-xs dark:text-slate-400 text-slate-500 flex items-center gap-1">
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-primary"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    {f}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-3 mt-auto">
+                                            <a href={p.github} target="_blank" rel="noopener noreferrer"
+                                                className="flex-1 text-center py-2 rounded-xl text-sm font-semibold dark:bg-slate-800 bg-slate-100 dark:text-white text-slate-800 hover:dark:bg-slate-700 hover:bg-slate-200 transition-all">
+                                                <span className="flex items-center justify-center gap-1.5">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                                                    Code
+                                                </span>
+                                            </a>
+                                            <a href={p.live} target="_blank" rel="noopener noreferrer"
+                                                className="flex-1 text-center py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all">
+                                                <span className="flex items-center justify-center gap-1.5">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                                    Demo
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function Education() {
+            const { data } = useContext(DataContext);
+            useScrollReveal();
+            const items = data.education || [];
+
+            return (
+                <section id="education" className="relative py-20 lg:py-28 dark:bg-slate-900/30 bg-slate-100/50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <SectionHead sectionKey="education" data={data} />
+
+                        <div className="relative max-w-3xl mx-auto">
+                            {/* Timeline line - desktop */}
+                            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 dark:bg-primary/20 bg-primary/10 -translate-x-1/2"></div>
+
+                            <div className="space-y-8">
+                                {items.map((item, i) => (
+                                    <div key={i} className={`relative flex items-start gap-6 md:gap-0 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} reveal`}>
+                                        {/* Timeline dot */}
+                                        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-5 h-5 rounded-full dark:bg-primary bg-primary border-4 dark:border-[#0F172A] border-white z-10"></div>
+
+                                        {/* Mobile timeline indicator */}
+                                        <div className="md:hidden flex-shrink-0 flex flex-col items-center">
+                                            <div className="w-4 h-4 rounded-full dark:bg-primary bg-primary border-2 dark:border-[#0F172A] border-white"></div>
+                                            <div className="w-0.5 flex-1 dark:bg-primary/20 bg-primary/10 mt-2"></div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className={`flex-1 md:w-[calc(50%-2rem)] ${i % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
+                                            <div className="glass-card rounded-2xl p-5 sm:p-6">
+                                                <span className="inline-block text-xs font-semibold dark:text-primary text-primary/80 bg-primary/5 px-3 py-1 rounded-full mb-3">{item.period}</span>
+                                                <h3 className="font-heading text-lg font-bold dark:text-white text-slate-900">{item.title}</h3>
+                                                <p className="text-sm dark:text-slate-400 text-slate-500 mt-1">{item.institution}</p>
+                                                <p className="text-sm dark:text-slate-300 text-slate-600 mt-3 leading-relaxed">{item.desc}</p>
+                                                {item.highlights && (
+                                                    <div className={`flex flex-wrap gap-2 mt-4 ${i % 2 === 0 ? 'md:justify-end' : ''}`}>
+                                                        {item.highlights.map((h, hi) => (
+                                                            <span key={hi} className="text-xs px-2.5 py-1 dark:bg-slate-800 bg-slate-100 dark:text-slate-300 text-slate-600 rounded-md">{h}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function Achievements() {
+            const { data } = useContext(DataContext);
+            useScrollReveal();
+            const achievements = data.achievements || [];
+
+            return (
+                <section id="achievements" className="relative py-20 lg:py-28">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <SectionHead sectionKey="achievements" data={data} />
+
+                        <div className="grid sm:grid-cols-2 gap-5">
+                            {achievements.map((a, i) => (
+                                <div key={i} className="glass-card rounded-2xl p-6 flex gap-4 reveal group">
+                                    <div className="w-12 h-12 rounded-xl dark:bg-primary/10 bg-primary/5 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary"><path d={a.icon}/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-heading font-semibold dark:text-white text-slate-900">{a.title}</h3>
+                                        <p className="text-sm dark:text-slate-400 text-slate-500 mt-1 leading-relaxed">{a.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function ContactSection() {
+            const { data } = useContext(DataContext);
+            useScrollReveal();
+            const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+            const [sending, setSending] = useState(false);
+            const contactInfo = [
+                { icon: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22,6l-10,7L2,6', label: 'Email', value: data.contact.email, href: 'mailto:' + data.contact.email },
+                { icon: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z M12 10a3 3 0 100-6 3 3 0 000 6z', label: 'Location', value: data.contact.location },
+                { icon: 'M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z', label: 'Phone', value: data.contact.phone, href: 'tel:' + data.contact.phone },
+            ];
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!form.name || !form.email || !form.message) { showToast('Please fill in required fields.', 'error'); return; }
+                setSending(true);
+                setTimeout(() => {
+                    const msgs = JSON.parse(localStorage.getItem('messages') || '[]');
+                    msgs.unshift({ ...form, createdAt: new Date().toISOString() });
+                    if (msgs.length > 50) msgs.pop();
+                    localStorage.setItem('messages', JSON.stringify(msgs));
+                    setSending(false);
+                    setForm({ name: '', email: '', subject: '', message: '' });
+                    showToast('Message sent successfully!');
+                }, 1200);
+            };
+
+            return (
+                <section id="contact" className="relative py-20 lg:py-28 dark:bg-slate-900/30 bg-slate-100/50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <SectionHead sectionKey="contact" data={data} />
+
+                        <div className="grid lg:grid-cols-5 gap-8 max-w-5xl mx-auto">
+                            <div className="lg:col-span-2 reveal space-y-5">
+                                <div className="glass-card rounded-2xl p-6">
+                                    <h3 className="font-heading text-xl font-bold mb-2 dark:text-white text-slate-900">{(data.sections && data.sections.contactCard && data.sections.contactCard.title) || "Let's Talk"}</h3>
+                                    <p className="text-sm dark:text-slate-400 text-slate-500 leading-relaxed mb-6">
+                                        {(data.sections && data.sections.contactCard && data.sections.contactCard.body) || (data.contact && data.contact.blurb) || ''}
+                                    </p>
+                                    <div className="space-y-4">
+                                        {contactInfo.map((c, i) => (
+                                            <div key={i} className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-lg dark:bg-primary/10 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary"><path d={c.icon}/></svg>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs dark:text-slate-500 text-slate-400">{c.label}</span>
+                                                    {c.href ? (
+                                                        <a href={c.href} className="block text-sm font-medium dark:text-white text-slate-900 hover:text-primary transition-colors">{c.value}</a>
+                                                    ) : (
+                                                        <span className="block text-sm font-medium dark:text-white text-slate-900">{c.value}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-3 reveal">
+                                {data.contact && data.contact.showForm === false ? (
+                                    <div className="glass-card rounded-2xl p-6 sm:p-8 h-full flex flex-col items-center justify-center text-center">
+                                        <h3 className="font-heading text-lg font-bold dark:text-white text-slate-900 mb-2">Contact form is hidden</h3>
+                                        <p className="text-sm dark:text-slate-400 text-slate-500">Reach out using one of the contact details on the left.</p>
+                                    </div>
+                                ) : (
+                                <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8 space-y-5">
+                                    <div className="grid sm:grid-cols-2 gap-5">
+                                        <div>
+                                            <label className="block text-sm font-medium dark:text-slate-300 text-slate-600 mb-1.5">Name *</label>
+                                            <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})}
+                                                className="w-full px-4 py-3 rounded-xl dark:bg-slate-800/50 bg-white dark:border-slate-700 border-slate-300 border dark:text-white text-slate-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium dark:text-slate-300 text-slate-600 mb-1.5">Email *</label>
+                                            <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
+                                                className="w-full px-4 py-3 rounded-xl dark:bg-slate-800/50 bg-white dark:border-slate-700 border-slate-300 border dark:text-white text-slate-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium dark:text-slate-300 text-slate-600 mb-1.5">Subject</label>
+                                        <input type="text" value={form.subject} onChange={e => setForm({...form, subject: e.target.value})}
+                                            className="w-full px-4 py-3 rounded-xl dark:bg-slate-800/50 bg-white dark:border-slate-700 border-slate-300 border dark:text-white text-slate-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium dark:text-slate-300 text-slate-600 mb-1.5">Message *</label>
+                                        <textarea rows="5" value={form.message} onChange={e => setForm({...form, message: e.target.value})}
+                                            className="w-full px-4 py-3 rounded-xl dark:bg-slate-800/50 bg-white dark:border-slate-700 border-slate-300 border dark:text-white text-slate-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm resize-none"></textarea>
+                                    </div>
+                                    <button type="submit" disabled={sending}
+                                        className="w-full py-3.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                        {sending ? (
+                                            <><svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0110 10"/></svg>Sending...</>
+                                        ) : (
+                                            <><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send Message</>
+                                        )}
+                                    </button>
+                                </form>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function Footer() {
+            const { data } = useContext(DataContext);
+            const p = data.profile;
+            return (
+                <footer className="relative dark:bg-slate-900/50 bg-slate-100 border-t dark:border-slate-800 border-slate-200 py-10">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="text-center md:text-left">
+                                <h3 className="font-heading text-xl font-bold gradient-text">{p.name}</h3>
+                                <p className="text-sm dark:text-slate-400 text-slate-500 mt-1">{p.tagline}</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                {(p.social || []).map((s, i) => (
+                                    <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+                                        className="w-10 h-10 rounded-xl dark:bg-slate-800 bg-slate-200 flex items-center justify-center dark:text-slate-400 text-slate-500 hover:text-primary dark:hover:bg-slate-700 hover:bg-slate-300 transition-all hover:-translate-y-1">
+                                        <SocialIcon path={s.path} size={18} />
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="mt-8 pt-6 border-t dark:border-slate-800 border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs dark:text-slate-500 text-slate-400">
+                            <p>&copy; {new Date().getFullYear()} {p.name}. All rights reserved.</p>
+                            <p className="flex items-center gap-1">
+                                {(data.footer && data.footer.note) ? <span>{(data.footer && data.footer.note)} &middot; </span> : null}
+                                {data.footer && data.footer.showAdminLink === false ? null : <a href="#admin" className="hover:text-primary transition-colors">Admin</a>}
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            );
+        }
+
+        // === ADMIN COMPONENTS ===
+
+        // --- shared admin UI ---
+        const ADMIN_INPUT = 'w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm';
+        const ADMIN_CARD = 'rounded-xl p-5';
+        const ADMIN_CARD_BG = { background: 'rgba(255,255,255,0.03)' };
+
+        function AdminHeading({ title, subtitle, children }) {
+            return (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 className="font-heading text-xl font-bold text-white">{title}</h2>
+                        {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+                    </div>
+                    {children}
+                </div>
+            );
+        }
+
+        function AdminSaveButton({ onClick, label = 'Save Changes', variant = '' }) {
+            const extra = variant === 'danger'
+                ? 'bg-red-500 hover:bg-red-600'
+                : variant === 'ghost'
+                    ? 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                    : 'bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30';
+            return (
+                <button onClick={onClick}
+                    className={'px-5 py-2 rounded-xl text-white font-semibold transition-all text-sm ' + extra}>
+                    {label}
+                </button>
+            );
+        }
+
+        function AdminField({ label, hint, children }) {
+            return (
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">{label}</label>
+                    {children}
+                    {hint && <p className="text-[11px] text-slate-500 mt-1">{hint}</p>}
+                </div>
+            );
+        }
+
+        function AdminInput({ value, onChange, ...rest }) {
+            return <input type="text" value={value == null ? '' : value} onChange={e => onChange(e.target.value)} className={ADMIN_INPUT} {...rest} />;
+        }
+
+        function AdminTextarea({ value, onChange, rows = 4, mono = false, ...rest }) {
+            return (
+                <textarea value={value == null ? '' : value} onChange={e => onChange(e.target.value)} rows={rows}
+                    className={ADMIN_INPUT + ' resize-y ' + (mono ? 'font-mono text-xs' : '')} {...rest} />
+            );
+        }
+
+        function AdminToggle({ label, hint, checked, onChange }) {
+            return (
+                <div className="flex items-start gap-3">
+                    <button type="button" role="switch" aria-checked={!!checked} onClick={() => onChange(!checked)}
+                        className={'mt-0.5 w-11 h-6 rounded-full transition-colors flex-shrink-0 ' + (checked ? 'bg-primary' : 'bg-slate-700')}>
+                        <span className={'block w-5 h-5 mt-0.5 rounded-full bg-white shadow transition-transform ' + (checked ? 'translate-x-[22px]' : 'translate-x-0.5')} />
+                    </button>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-200">{label}</p>
+                        {hint && <p className="text-[11px] text-slate-500 mt-0.5">{hint}</p>}
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminColorInput({ value, onChange }) {
+            return (
+                <div className="flex items-center gap-2">
+                    <input type="color" value={value || '#000000'} onChange={e => onChange(e.target.value)}
+                        className="w-11 h-11 rounded-lg bg-slate-800/50 border border-slate-700 cursor-pointer p-1" />
+                    <input type="text" value={value || ''} onChange={e => onChange(e.target.value)}
+                        className={ADMIN_INPUT + ' font-mono'} placeholder="#3B82F6" />
+                </div>
+            );
+        }
+
+        function AdminModal({ title, onClose, children, footer, wide = false }) {
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+                    <div className={'glass rounded-2xl p-6 w-full ' + (wide ? 'max-w-2xl' : 'max-w-lg') + ' max-h-[90vh] overflow-y-auto'}
+                        onClick={e => e.stopPropagation()}>
+                        <h3 className="font-heading text-lg font-bold text-white mb-4">{title}</h3>
+                        {children}
+                        {footer && <div className="flex gap-3 mt-6">{footer}</div>}
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminModalActions({ onSave, onCancel, saveLabel = 'Save' }) {
+            return (
+                <>
+                    <button onClick={onSave} className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">{saveLabel}</button>
+                    <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl text-slate-300 font-semibold bg-slate-800/50 text-sm">Cancel</button>
+                </>
+            );
+        }
+
+        function AdminRow({ title, subtitle, children }) {
+            return (
+                <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-200 truncate">{title}</p>
+                        {subtitle && <p className="text-[11px] text-slate-500 truncate">{subtitle}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">{children}</div>
+                </div>
+            );
+        }
+
+        function AdminPillButton({ children, onClick, tone = 'slate' }) {
+            const tones = {
+                blue: 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30',
+                green: 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30',
+                red: 'bg-red-500/20 text-red-400 hover:bg-red-500/30',
+                slate: 'bg-slate-700/40 text-slate-300 hover:bg-slate-700/70',
+            };
+            return (
+                <button onClick={onClick}
+                    className={'px-3 py-1.5 rounded-lg text-xs font-medium transition-all ' + (tones[tone] || tones.slate)}>
+                    {children}
+                </button>
+            );
+        }
+
+        // Splits a textarea value into a list, one entry per line.
+        function linesToList(text) {
+            return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
+        }
+        function listToLines(list) {
+            return (list || []).join('\n');
+        }
+        function csvToList(text) {
+            return String(text || '').split(',').map(s => s.trim()).filter(Boolean);
+        }
+        function listToCsv(list) {
+            return (list || []).join(', ');
+        }
+
+        function AdminLogin({ onLogin }) {
+            const [u, setU] = useState('');
+            const [p, setP] = useState('');
+            const [err, setErr] = useState('');
+
+            useEffect(() => {
+                if (!loadAdmin()) { saveAdmin({ username: 'admin', password: 'admin123' }); }
+            }, []);
+
+            const handle = (e) => {
+                e.preventDefault();
+                const auth = loadAdmin() || { username: 'admin', password: 'admin123' };
+                if (u === auth.username && p === auth.password) { onLogin(); }
+                else { setErr('Invalid username or password'); }
+            };
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4">
+                    <div className="glass-card rounded-2xl p-8 w-full max-w-md">
+                        <div className="text-center mb-6">
+                            <h2 className="font-heading text-2xl font-bold text-white">Admin Panel</h2>
+                            <p className="text-slate-400 text-sm mt-1">Sign in to manage your portfolio</p>
+                        </div>
+                        <form onSubmit={handle} className="space-y-4">
+                            {err && <div className="text-red-400 text-sm bg-red-400/10 px-4 py-2 rounded-lg">{err}</div>}
+                            <input type="text" placeholder="Username" value={u} onChange={e => setU(e.target.value)} required
+                                className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
+                            <input type="password" placeholder="Password" value={p} onChange={e => setP(e.target.value)} required
+                                className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
+                            <button type="submit"
+                                className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all">
+                                Sign In
+                            </button>
+                        </form>
+                        <div className="mt-6 text-center">
+                            <button onClick={() => { window.location.hash = ''; }}
+                                className="text-sm text-slate-400 hover:text-primary transition-colors">
+                                &larr; Back to Portfolio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminDashboard({ onLogout }) {
+            const { data, updateData } = useContext(DataContext);
+            const [section, setSection] = useState('profile');
+            const sidebarItems = [
+                { id: 'site', label: 'Site & SEO', icon: 'M4 5h16v14H4zM4 9h16M9 9v10' },
+                { id: 'profile', label: 'Profile', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+                { id: 'hero', label: 'Hero', icon: 'M4 5h16v6H4zM4 13h7v6H4zM13 13h7v6h-7z' },
+                { id: 'sections', label: 'Headings', icon: 'M4 6h16M4 12h10M4 18h7' },
+                { id: 'interests', label: 'Interests', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+                { id: 'stats', label: 'Stats', icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2' },
+                { id: 'skills', label: 'Skills', icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
+                { id: 'projects', label: 'Projects', icon: 'M7 17L17 7M17 7H7M17 7V17' },
+                { id: 'education', label: 'Education', icon: 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z M12 14l9-5-9-5-9 5 9 5z' },
+                { id: 'achievements', label: 'Achievements', icon: 'M9 12l2 2 4-4M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' },
+                { id: 'contact', label: 'Contact', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 00 2-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                { id: 'social', label: 'Social Links', icon: 'M17 8a4 4 0 100-8 4 4 0 000 8zM3 21a6 6 0 016-6M10 21h11M10 11h11' },
+                { id: 'theme', label: 'Theme', icon: 'M7 4a3 3 0 013 3 3 3 0 003 3 3 3 0 003 3 3 3 0 01-3 3H8a4 4 0 01-4-4 5 5 0 015-5z' },
+                { id: 'messages', label: 'Messages', icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z' },
+                { id: 'data', label: 'Backup', icon: 'M12 3v12M8 11l4 4 4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2' },
+                { id: 'settings', label: 'Settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+            ];
+
+            const sidebar = (
+                <div className="w-64 flex-shrink-0 glass rounded-2xl p-3 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
+                    <div className="px-3 py-3 mb-2">
+                        <h3 className="font-heading font-bold text-white text-lg">Admin</h3>
+                        <p className="text-xs text-slate-400">Portfolio Manager</p>
+                    </div>
+                    {sidebarItems.map(s => (
+                        <button key={s.id} onClick={() => setSection(s.id)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${section === s.id ? 'bg-primary/20 text-primary' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d={s.icon}/></svg>
+                            {s.label}
+                        </button>
+                    ))}
+                    <div className="pt-3 mt-3 border-t border-slate-700/50 space-y-1">
+                        <button onClick={() => { window.location.hash = ''; }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 12H3m0 0l4-4m-4 4l4 4"/></svg>
+                            View Site
+                        </button>
+                        <button onClick={onLogout}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderEditor = () => {
+                switch (section) {
+                    case 'site': return <AdminSiteEditor data={data} updateData={updateData} />;
+                    case 'profile': return <AdminProfileEditor data={data} updateData={updateData} />;
+                    case 'hero': return <AdminHeroEditor data={data} updateData={updateData} />;
+                    case 'sections': return <AdminSectionsEditor data={data} updateData={updateData} />;
+                    case 'interests': return <AdminInterestsEditor data={data} updateData={updateData} />;
+                    case 'stats': return <AdminStatsEditor data={data} updateData={updateData} />;
+                    case 'skills': return <AdminSkillsEditor data={data} updateData={updateData} />;
+                    case 'projects': return <AdminProjectsEditor data={data} updateData={updateData} />;
+                    case 'education': return <AdminEducationEditor data={data} updateData={updateData} />;
+                    case 'achievements': return <AdminAchievementsEditor data={data} updateData={updateData} />;
+                    case 'contact': return <AdminContactEditor data={data} updateData={updateData} />;
+                    case 'social': return <AdminSocialEditor data={data} updateData={updateData} />;
+                    case 'theme': return <AdminThemeEditor data={data} updateData={updateData} />;
+                    case 'messages': return <AdminMessages />;
+                    case 'data': return <AdminDataManager data={data} updateData={updateData} />;
+                    case 'settings': return <AdminSettings />;
+                    default: return null;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-[#0F172A] flex p-4 gap-4">
+                    <div className="hidden lg:block">{sidebar}</div>
+                    <div className="flex-1 min-w-0 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
+                        <div className="glass rounded-2xl p-4 sm:p-6">
+                            <div className="lg:hidden flex gap-2 mb-4 overflow-x-auto pb-2">
+                                {sidebarItems.map(s => (
+                                    <button key={s.id} onClick={() => setSection(s.id)}
+                                        className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-medium transition-all ${section === s.id ? 'bg-primary/20 text-primary' : 'bg-slate-800/50 text-slate-400 hover:text-white'}`}>
+                                        {s.label}
+                                    </button>
+                                ))}
+                                <button onClick={() => { window.location.hash = ''; }}
+                                    className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-medium bg-slate-800/50 text-slate-400 hover:text-white">View Site</button>
+                                <button onClick={onLogout}
+                                    className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-medium bg-red-400/10 text-red-400">Logout</button>
+                            </div>
+                            {renderEditor()}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminProfileEditor({ data, updateData }) {
+            const p = data.profile || {};
+            const [form, setForm] = useState({
+                name: p.name || '',
+                tagline: p.tagline || '',
+                status: p.status || '',
+                available: p.available !== false,
+                image: p.image || '',
+                email: p.email || '',
+                phone: p.phone || '',
+                location: p.location || '',
+                heroDescription: p.heroDescription || '',
+                about: (p.about || []).join('\n---\n'),
+            });
+
+            useEffect(() => {
+                setForm({
+                    name: p.name || '', tagline: p.tagline || '', status: p.status || '',
+                    available: p.available !== false, image: p.image || '', email: p.email || '',
+                    phone: p.phone || '', location: p.location || '',
+                    heroDescription: p.heroDescription || '',
+                    about: (p.about || []).join('\n---\n'),
+                });
+            }, [data.profile]);
+
+            const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }));
+
+            const save = () => {
+                const about = linesToList(form.about.replace(/\n---\n/g, '\n'));
+                updateData({
+                    ...data,
+                    profile: {
+                        ...p,
+                        name: form.name, tagline: form.tagline, status: form.status,
+                        available: form.available, image: form.image, email: form.email,
+                        phone: form.phone, location: form.location,
+                        heroDescription: form.heroDescription, about,
+                    },
+                });
+                showToast('Profile updated!');
+            };
+
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Profile" subtitle="Your name, headline and biography">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <AdminField label="Full Name"><AdminInput value={form.name} onChange={set('name')} /></AdminField>
+                        <AdminField label="Tagline" hint="Shown under your name in the footer."><AdminInput value={form.tagline} onChange={set('tagline')} /></AdminField>
+                        <AdminField label="Status Badge" hint="Leave blank to hide the badge in the hero."><AdminInput value={form.status} onChange={set('status')} placeholder="Available for Internships" /></AdminField>
+                        <AdminField label="Profile Image" hint="File name in this folder, or a full URL.">
+                            <div className="flex items-center gap-3">
+                                <img src={form.image || 'IMG_20260221_164230.jpg'} alt=""
+                                    className="w-12 h-12 rounded-xl object-cover border border-slate-700 bg-slate-800" />
+                                <AdminInput value={form.image} onChange={set('image')} />
+                            </div>
+                        </AdminField>
+                        <AdminField label="Email"><AdminInput type="email" value={form.email} onChange={set('email')} /></AdminField>
+                        <AdminField label="Phone"><AdminInput value={form.phone} onChange={set('phone')} /></AdminField>
+                        <AdminField label="Location"><AdminInput value={form.location} onChange={set('location')} /></AdminField>
+                        <div className="flex items-end pb-1">
+                            <AdminToggle
+                                label="Show as available"
+                                hint="Green pulsing dot next to the status badge."
+                                checked={form.available}
+                                onChange={set('available')}
+                            />
+                        </div>
+                    </div>
+
+                    <AdminField label="Hero Description" hint="Paragraph under your name on the home screen.">
+                        <AdminTextarea value={form.heroDescription} onChange={set('heroDescription')} rows={3} />
+                    </AdminField>
+
+                    <AdminField label="About Me" hint="One paragraph per line. They render as separate paragraphs.">
+                        <AdminTextarea value={form.about} onChange={set('about')} rows={6} />
+                    </AdminField>
+                </div>
+            );
+        }
+
+        function AdminSiteEditor({ data, updateData }) {
+            const s = data.site || {};
+            const [form, setForm] = useState({ ...s });
+            useEffect(() => { setForm({ ...(data.site || {}) }); }, [data.site]);
+            const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }));
+            const save = () => {
+                updateData({ ...data, site: { ...s, ...form } });
+                showToast('Site & SEO settings saved!');
+            };
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Site & SEO" subtitle="Browser tab title and search/social previews">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+                    <div className="space-y-4">
+                        <AdminField label="Page Title" hint="Shown in the browser tab.">
+                            <AdminInput value={form.title} onChange={set('title')} />
+                        </AdminField>
+                        <AdminField label="Meta Description" hint="Aim for 150–160 characters.">
+                            <AdminTextarea value={form.description} onChange={set('description')} rows={3} />
+                        </AdminField>
+                        <AdminField label="Keywords" hint="Comma separated.">
+                            <AdminInput value={form.keywords} onChange={set('keywords')} />
+                        </AdminField>
+                        <AdminField label="Open Graph Title" hint="Preview title when shared on social media.">
+                            <AdminInput value={form.ogTitle} onChange={set('ogTitle')} />
+                        </AdminField>
+                        <AdminField label="Open Graph Description">
+                            <AdminTextarea value={form.ogDescription} onChange={set('ogDescription')} rows={2} />
+                        </AdminField>
+                    </div>
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-3">Search Preview</h3>
+                        <div className="text-sm">
+                            <p className="text-emerald-400 truncate">{form.title || 'Page title'}</p>
+                            <p className="text-slate-500 text-xs truncate mt-0.5">https://your-site.com</p>
+                            <p className="text-slate-400 text-xs mt-1 line-clamp-2">{form.description || 'Meta description preview.'}</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminHeroEditor({ data, updateData }) {
+            const h = data.hero || {};
+            const n = data.nav || {};
+            const p = data.profile || {};
+            const [form, setForm] = useState({ ...h });
+            const [navItems, setNavItems] = useState(listToLines(n.items));
+            const [navCta, setNavCta] = useState({ label: n.ctaLabel || '', target: n.ctaTarget || 'contact' });
+            const [words, setWords] = useState(listToLines(p.typingWords));
+
+            useEffect(() => {
+                setForm({ ...(data.hero || {}) });
+                setNavItems(listToLines((data.nav || {}).items));
+                setNavCta({ label: (data.nav || {}).ctaLabel || '', target: (data.nav || {}).ctaTarget || 'contact' });
+                setWords(listToLines((data.profile || {}).typingWords));
+            }, [data.hero, data.nav, data.profile.typingWords]);
+
+            const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }));
+
+            const save = () => {
+                updateData({
+                    ...data,
+                    hero: { ...h, ...form },
+                    nav: { ...n, items: linesToList(navItems), ctaLabel: navCta.label, ctaTarget: navCta.target },
+                    profile: { ...p, typingWords: linesToList(words) },
+                });
+                showToast('Hero & navigation saved!');
+            };
+
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Hero & Navigation" subtitle="Home screen text, buttons and the top bar">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <AdminField label="Greeting" hint="Text before your name. Leave blank for none.">
+                            <AdminInput value={form.greeting} onChange={set('greeting')} placeholder="Hi, I'm" />
+                        </AdminField>
+                        <AdminField label="View Projects Button">
+                            <AdminInput value={form.viewProjectsLabel} onChange={set('viewProjectsLabel')} />
+                        </AdminField>
+                        <AdminField label="Contact Button">
+                            <AdminInput value={form.contactLabel} onChange={set('contactLabel')} />
+                        </AdminField>
+                        <AdminField label="Resume Button Label" hint="Leave blank to hide the button.">
+                            <AdminInput value={form.resumeLabel} onChange={set('resumeLabel')} />
+                        </AdminField>
+                        <div className="sm:col-span-2">
+                            <AdminField label="Resume File / URL" hint="Leave blank and the button shows a 'coming soon' message instead.">
+                                <AdminInput value={form.resumeUrl} onChange={set('resumeUrl')} placeholder="resume.pdf" />
+                            </AdminField>
+                        </div>
+                        <div className="sm:col-span-2">
+                            <AdminToggle label="Show scroll-down hint" checked={form.showScrollHint !== false}
+                                onChange={v => setForm(f => ({ ...f, showScrollHint: v }))} />
+                        </div>
+                    </div>
+
+                    <AdminField label="Rotating Typing Words" hint="One per line. These cycle under your name.">
+                        <AdminTextarea value={words} onChange={setWords} rows={5} />
+                    </AdminField>
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-4">Navigation Bar</h3>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <AdminField label="Nav Items" hint="One per line. Must match section ids: home, about, skills, projects, education, achievements, contact.">
+                                <AdminTextarea value={navItems} onChange={setNavItems} rows={8} />
+                            </AdminField>
+                            <div className="space-y-4">
+                                <AdminField label="Button Label" hint="Leave blank to hide the nav button.">
+                                    <AdminInput value={navCta.label} onChange={e => setNavCta(v => ({ ...v, label: e.target.value }))} />
+                                </AdminField>
+                                <AdminField label="Button Scrolls To">
+                                    <select value={navCta.target} onChange={e => setNavCta(v => ({ ...v, target: e.target.value }))} className={ADMIN_INPUT}>
+                                        {['home', 'about', 'skills', 'projects', 'education', 'achievements', 'contact'].map(id => (
+                                            <option key={id} value={id} className="bg-slate-900">{id}</option>
+                                        ))}
+                                    </select>
+                                </AdminField>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const HEADING_GROUPS = [
+            { key: 'about', label: 'About' },
+            { key: 'skills', label: 'Skills' },
+            { key: 'projects', label: 'Projects' },
+            { key: 'education', label: 'Education' },
+            { key: 'achievements', label: 'Achievements' },
+            { key: 'contact', label: 'Contact' },
+            { key: 'interests', label: 'Interests (card title)' },
+            { key: 'contactCard', label: 'Contact Card' },
+        ];
+
+        function AdminSectionsEditor({ data, updateData }) {
+            const [sections, setSections] = useState({ ...(data.sections || {}) });
+            useEffect(() => { setSections({ ...(data.sections || {}) }); }, [data.sections]);
+
+            const update = (key, field, value) => {
+                setSections(s => ({ ...s, [key]: { ...(s[key] || {}), [field]: value } }));
+            };
+            const save = () => {
+                updateData({ ...data, sections: { ...(data.sections || {}), ...sections } });
+                showToast('Section headings saved!');
+            };
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Section Headings" subtitle="Every heading and small label on the public site">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+                    <div className="space-y-3">
+                        {HEADING_GROUPS.map(g => (
+                            <div key={g.key} className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                                <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">{g.label}</p>
+                                <div className="grid sm:grid-cols-2 gap-3">
+                                    {g.key !== 'interests' && g.key !== 'contactCard' && (
+                                        <AdminField label="Small Label">
+                                            <AdminInput value={(sections[g.key] || {}).eyebrow || ''} onChange={v => update(g.key, 'eyebrow', v)} />
+                                        </AdminField>
+                                    )}
+                                    <AdminField label={g.key === 'contactCard' ? 'Title' : 'Heading'}>
+                                        <AdminInput
+                                            value={g.key === 'contactCard' ? ((sections[g.key] || {}).title || '') : ((sections[g.key] || {}).title || '')}
+                                            onChange={v => update(g.key, 'title', v)} />
+                                    </AdminField>
+                                </div>
+                                {g.key === 'contactCard' && (
+                                    <div className="mt-3">
+                                        <AdminField label="Body Text">
+                                            <AdminTextarea value={(sections[g.key] || {}).body || ''} onChange={v => update(g.key, 'body', v)} rows={3} />
+                                        </AdminField>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminStatsEditor({ data, updateData }) {
+            const items = data.stats || [];
+            const [editing, setEditing] = useState(null);
+            const [showForm, setShowForm] = useState(false);
+
+            const save = () => {
+                let next;
+                if (editing._idx !== undefined) next = items.map((it, i) => i === editing._idx ? editing : it);
+                else next = [...items, editing];
+                updateData({ ...data, stats: next });
+                setShowForm(false); setEditing(null);
+                showToast('Stats saved!');
+            };
+            const del = (i) => {
+                if (!confirm('Delete this stat?')) return;
+                updateData({ ...data, stats: items.filter((_, x) => x !== i) });
+                showToast('Stat deleted!');
+            };
+            return (
+                <div className="space-y-4">
+                    <AdminHeading title="Stats" subtitle="Cards in the About sidebar. The first one also appears on your photo.">
+                        <AdminPillButton tone="blue" onClick={() => { setEditing({ value: '', label: '', icon: '' }); setShowForm(true); }}>+ Add Stat</AdminPillButton>
+                    </AdminHeading>
+                    {items.length === 0 && <p className="text-sm text-slate-400">No stats yet.</p>}
+                    <div className="space-y-2">
+                        {items.map((s, i) => (
+                            <AdminRow key={i} title={`${s.value} — ${s.label}`} subtitle={s.icon ? 'Custom icon' : 'No icon'}>
+                                <AdminPillButton tone="blue" onClick={() => { setEditing({ ...s, _idx: i }); setShowForm(true); }}>Edit</AdminPillButton>
+                                <AdminPillButton tone="red" onClick={() => del(i)}>Del</AdminPillButton>
+                            </AdminRow>
+                        ))}
+                    </div>
+                    {showForm && (
+                        <AdminModal title={(editing._idx !== undefined ? 'Edit' : 'Add') + ' Stat'} onClose={() => setShowForm(false)}
+                            footer={<AdminModalActions onSave={save} onCancel={() => setShowForm(false)} />}>
+                            <div className="space-y-3">
+                                <AdminField label="Value" hint="e.g. 2+, 10+, 500ms">
+                                    <AdminInput value={editing.value} onChange={v => setEditing(e => ({ ...e, value: v }))} />
+                                </AdminField>
+                                <AdminField label="Label">
+                                    <AdminInput value={editing.label} onChange={v => setEditing(e => ({ ...e, label: v }))} />
+                                </AdminField>
+                                <AdminField label="Icon Path" hint="Optional SVG path data. Leave blank to hide the icon.">
+                                    <AdminTextarea value={editing.icon || ''} onChange={v => setEditing(e => ({ ...e, icon: v }))} rows={3} mono />
+                                </AdminField>
+                            </div>
+                        </AdminModal>
+                    )}
+                </div>
+            );
+        }
+
+        function AdminInterestsEditor({ data, updateData }) {
+            const [text, setText] = useState(listToLines(data.interests));
+            useEffect(() => { setText(listToLines(data.interests)); }, [data.interests]);
+            const save = () => {
+                updateData({ ...data, interests: linesToList(text) });
+                showToast('Interests updated!');
+            };
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Areas of Interest" subtitle="Tags shown in the About section">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+                    <AdminField label="One interest per line">
+                        <AdminTextarea value={text} onChange={setText} rows={8} />
+                    </AdminField>
+                    <p className="text-xs text-slate-500">{linesToList(text).length} interest(s)</p>
+                </div>
+            );
+        }
+
+        function useAdminEditor(initialItems, onSave) {
+            const [items, setItems] = useState(initialItems);
+            const [editing, setEditing] = useState(null);
+            const [showForm, setShowForm] = useState(false);
+            const itemsRef = useRef(initialItems);
+            const reset = () => { setEditing(null); setShowForm(false); };
+            const add = () => { setEditing({}); setShowForm(true); };
+            const edit = (item) => { setEditing({...item}); setShowForm(true); };
+            const del = (idx) => {
+                if (!confirm('Delete this item?')) return;
+                const next = items.filter((_, i) => i !== idx);
+                setItems(next);
+                onSave(next);
+                showToast('Deleted!');
+            };
+            const saveItem = (item) => {
+                const clean = Object.assign({}, item);
+                const idx = clean._idx;
+                delete clean._idx;
+                let next;
+                if (idx !== undefined) {
+                    next = items.map((it, i) => i === idx ? clean : it);
+                } else {
+                    next = [...items, clean];
+                }
+                setItems(next);
+                onSave(next);
+                reset();
+                showToast('Saved!');
+            };
+            useEffect(() => {
+                if (JSON.stringify(initialItems) !== JSON.stringify(itemsRef.current)) {
+                    itemsRef.current = initialItems;
+                    setItems(initialItems);
+                }
+            }, [initialItems]);
+            return { items, editing, showForm, add, edit, del, saveItem, setShowForm, setEditing, reset };
+        }
+
+        function AdminProjectsEditor({ data, updateData }) {
+            const { items, editing, showForm, add, edit, del, saveItem, setShowForm, setEditing, reset } = useAdminEditor(
+                data.projects || [],
+                (newItems) => updateData({ ...data, projects: newItems })
+            );
+            const fields = [
+                { key: 'title', label: 'Project Title' },
+                { key: 'subtitle', label: 'Subtitle' },
+                { key: 'desc', label: 'Description', type: 'textarea' },
+                { key: 'image', label: 'Image URL' },
+                { key: 'github', label: 'GitHub URL' },
+                { key: 'live', label: 'Live Demo URL' },
+                { key: 'status', label: 'Status' },
+                { key: 'tags', label: 'Tags (comma-separated)' },
+                { key: 'features', label: 'Features (comma-separated)' },
+            ];
+            const renderForm = () => {
+                const item = editing || {};
+                let fi = { ...item };
+                if (!fi.tags) fi.tags = '';
+                if (!fi.features) fi.features = '';
+                if (typeof fi.tags === 'object') fi.tags = (fi.tags || []).join(', ');
+                if (typeof fi.features === 'object') fi.features = (fi.features || []).join(', ');
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => reset()}>
+                        <div className="glass rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                            <h3 className="font-heading text-lg font-bold text-white mb-4">{fi._idx !== undefined ? 'Edit' : 'Add'} Project</h3>
+                            <div className="space-y-3">
+                                {fields.map(f => (
+                                    <div key={f.key}>
+                                        <label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                                        {f.type === 'textarea' ? (
+                                            <textarea value={fi[f.key] || ''} onChange={e => { fi[f.key] = e.target.value; setEditing({...fi}); }}
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary transition-all resize-none" rows="3" />
+                                        ) : (
+                                            <input type="text" value={fi[f.key] || ''} onChange={e => { fi[f.key] = e.target.value; setEditing({...fi}); }}
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary transition-all" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button onClick={() => {
+                                    const out = { ...fi };
+                                    ['tags', 'features'].forEach(k => {
+                                        if (typeof out[k] === 'string') out[k] = out[k].split(',').map(s => s.trim()).filter(Boolean);
+                                    });
+                                    saveItem(out);
+                                }}
+                                    className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">
+                                    Save
+                                </button>
+                                <button onClick={reset}
+                                    className="flex-1 py-2.5 rounded-xl text-slate-300 font-semibold bg-slate-800/50 text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+            return (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="font-heading text-xl font-bold text-white">Projects</h2>
+                        <button onClick={add}
+                            className="px-4 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">
+                            + Add Project
+                        </button>
+                    </div>
+                    {items.length === 0 && <p className="text-sm text-slate-400">No projects yet.</p>}
+                    <div className="space-y-3">
+                        {items.map((item, i) => (
+                            <div key={i} className="glass rounded-xl p-4 flex items-start justify-between gap-3" style={{background:'rgba(255,255,255,0.03)'}}>
+                                <div className="min-w-0 flex-1">
+                                    <h4 className="text-sm font-semibold text-white">{item.title}</h4>
+                                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{item.desc}</p>
+                                    <span className="inline-block text-[10px] mt-1.5 px-2 py-0.5 rounded-full dark:bg-primary/10 text-primary">{item.status || 'Draft'}</span>
+                                </div>
+                                <div className="flex gap-2 flex-shrink-0">
+                                    <button onClick={() => { const copy = {...item, _idx: i}; edit(copy); }}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all">Edit</button>
+                                    <button onClick={() => del(i)}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all">Del</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {showForm && renderForm()}
+                </div>
+            );
+        }
+
+        function AdminEducationEditor({ data, updateData }) {
+            const { items, editing, showForm, add, edit, del, saveItem, setShowForm, setEditing, reset } = useAdminEditor(
+                data.education || [],
+                (newItems) => updateData({ ...data, education: newItems })
+            );
+            const fields = [
+                { key: 'period', label: 'Period' },
+                { key: 'title', label: 'Degree / Title' },
+                { key: 'institution', label: 'Institution' },
+                { key: 'desc', label: 'Description', type: 'textarea' },
+                { key: 'highlights', label: 'Highlights (comma-separated)' },
+            ];
+            const renderForm = () => {
+                const item = editing || {};
+                let fi = { ...item };
+                if (!fi.highlights) fi.highlights = '';
+                if (typeof fi.highlights === 'object') fi.highlights = (fi.highlights || []).join(', ');
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => reset()}>
+                        <div className="glass rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                            <h3 className="font-heading text-lg font-bold text-white mb-4">{fi._idx !== undefined ? 'Edit' : 'Add'} Education</h3>
+                            <div className="space-y-3">
+                                {fields.map(f => (
+                                    <div key={f.key}>
+                                        <label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                                        {f.type === 'textarea' ? (
+                                            <textarea value={fi[f.key] || ''} onChange={e => { fi[f.key] = e.target.value; setEditing({...fi}); }}
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary transition-all resize-none" rows="3" />
+                                        ) : (
+                                            <input type="text" value={fi[f.key] || ''} onChange={e => { fi[f.key] = e.target.value; setEditing({...fi}); }}
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary transition-all" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button onClick={() => {
+                                    const out = { ...fi };
+                                    if (typeof out.highlights === 'string') out.highlights = out.highlights.split(',').map(s => s.trim()).filter(Boolean);
+                                    saveItem(out);
+                                }}
+                                    className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">
+                                    Save
+                                </button>
+                                <button onClick={reset}
+                                    className="flex-1 py-2.5 rounded-xl text-slate-300 font-semibold bg-slate-800/50 text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+            return (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="font-heading text-xl font-bold text-white">Education</h2>
+                        <button onClick={add}
+                            className="px-4 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">
+                            + Add Education
+                        </button>
+                    </div>
+                    {items.length === 0 && <p className="text-sm text-slate-400">No education entries yet.</p>}
+                    <div className="space-y-3">
+                        {items.map((item, i) => (
+                            <div key={i} className="glass rounded-xl p-4 flex items-start justify-between gap-3" style={{background:'rgba(255,255,255,0.03)'}}>
+                                <div className="min-w-0 flex-1">
+                                    <h4 className="text-sm font-semibold text-white">{item.title}</h4>
+                                    <p className="text-xs text-slate-400 mt-0.5">{item.institution} &middot; {item.period}</p>
+                                </div>
+                                <div className="flex gap-2 flex-shrink-0">
+                                    <button onClick={() => { const copy = {...item, _idx: i}; edit(copy); }}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all">Edit</button>
+                                    <button onClick={() => del(i)}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all">Del</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {showForm && renderForm()}
+                </div>
+            );
+        }
+
+        function AdminAchievementsEditor({ data, updateData }) {
+            const { items, editing, showForm, add, edit, del, saveItem, setShowForm, setEditing, reset } = useAdminEditor(
+                data.achievements || [],
+                (newItems) => updateData({ ...data, achievements: newItems })
+            );
+            const fields = [
+                { key: 'title', label: 'Title' },
+                { key: 'desc', label: 'Description', type: 'textarea' },
+                { key: 'icon', label: 'SVG Path (icon)' },
+            ];
+            const renderForm = () => {
+                const item = editing || {};
+                let fi = { ...item };
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => reset()}>
+                        <div className="glass rounded-2xl p-6 w-full max-w-lg" onClick={e => e.stopPropagation()}>
+                            <h3 className="font-heading text-lg font-bold text-white mb-4">{fi._idx !== undefined ? 'Edit' : 'Add'} Achievement</h3>
+                            <div className="space-y-3">
+                                {fields.map(f => (
+                                    <div key={f.key}>
+                                        <label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                                        {f.type === 'textarea' ? (
+                                            <textarea value={fi[f.key] || ''} onChange={e => { fi[f.key] = e.target.value; setEditing({...fi}); }}
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary transition-all resize-none" rows="3" />
+                                        ) : (
+                                            <input type="text" value={fi[f.key] || ''} onChange={e => { fi[f.key] = e.target.value; setEditing({...fi}); }}
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary transition-all" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button onClick={() => saveItem(fi)}
+                                    className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">Save</button>
+                                <button onClick={reset}
+                                    className="flex-1 py-2.5 rounded-xl text-slate-300 font-semibold bg-slate-800/50 text-sm">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+            return (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="font-heading text-xl font-bold text-white">Achievements</h2>
+                        <button onClick={add}
+                            className="px-4 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">
+                            + Add Achievement
+                        </button>
+                    </div>
+                    {items.length === 0 && <p className="text-sm text-slate-400">No achievements yet.</p>}
+                    <div className="space-y-3">
+                        {items.map((item, i) => (
+                            <div key={i} className="glass rounded-xl p-4 flex items-start justify-between gap-3" style={{background:'rgba(255,255,255,0.03)'}}>
+                                <div className="min-w-0 flex-1">
+                                    <h4 className="text-sm font-semibold text-white">{item.title}</h4>
+                                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{item.desc}</p>
+                                </div>
+                                <div className="flex gap-2 flex-shrink-0">
+                                    <button onClick={() => { const copy = {...item, _idx: i}; edit(copy); }}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all">Edit</button>
+                                    <button onClick={() => del(i)}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all">Del</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {showForm && renderForm()}
+                </div>
+            );
+        }
+
+        function AdminSkillsEditor({ data, updateData }) {
+            const cats = data.skills || [];
+            const [editingCat, setEditingCat] = useState(null);
+            const [editingSkill, setEditingSkill] = useState(null);
+            const [showCatForm, setShowCatForm] = useState(false);
+            const [showSkillForm, setShowSkillForm] = useState(false);
+            const [catForm, setCatForm] = useState({ name: '' });
+            const [skillForm, setSkillForm] = useState({ name: '', pct: 80 });
+            const [targetCat, setTargetCat] = useState(0);
+
+            const saveCat = () => {
+                let next;
+                if (editingCat !== null) {
+                    next = cats.map((c, i) => i === editingCat ? { ...c, name: catForm.name } : c);
+                } else {
+                    next = [...cats, { name: catForm.name, items: [] }];
+                }
+                updateData({ ...data, skills: next });
+                setShowCatForm(false); setEditingCat(null); setCatForm({ name: '' });
+                showToast('Category saved!');
+            };
+
+            const saveSkill = () => {
+                let next = [...cats];
+                const items = [...(next[targetCat].items || [])];
+                if (editingSkill !== null) {
+                    items[editingSkill] = { name: skillForm.name, pct: Number(skillForm.pct) };
+                } else {
+                    items.push({ name: skillForm.name, pct: Number(skillForm.pct) });
+                }
+                next[targetCat] = { ...next[targetCat], items };
+                updateData({ ...data, skills: next });
+                setShowSkillForm(false); setEditingSkill(null); setSkillForm({ name: '', pct: 80 });
+                showToast('Skill saved!');
+            };
+
+            const delCat = (idx) => {
+                if (!confirm('Delete this category and all its skills?')) return;
+                updateData({ ...data, skills: cats.filter((_, i) => i !== idx) });
+                showToast('Category deleted!');
+            };
+
+            const delSkill = (catIdx, skillIdx) => {
+                if (!confirm('Delete this skill?')) return;
+                let next = [...cats];
+                next[catIdx] = { ...next[catIdx], items: next[catIdx].items.filter((_, i) => i !== skillIdx) };
+                updateData({ ...data, skills: next });
+                showToast('Skill deleted!');
+            };
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h2 className="font-heading text-xl font-bold text-white">Skills</h2>
+                        <button onClick={() => { setEditingCat(null); setCatForm({ name: '' }); setShowCatForm(true); }}
+                            className="px-4 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">
+                            + Add Category
+                        </button>
+                    </div>
+
+                    {cats.map((cat, ci) => (
+                        <div key={ci} className="glass rounded-xl p-4" style={{background:'rgba(255,255,255,0.03)'}}>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-semibold text-white">{cat.name}</h3>
+                                <div className="flex gap-2">
+                                    <button onClick={() => { setEditingCat(ci); setCatForm({ name: cat.name }); setShowCatForm(true); }}
+                                        className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400">Edit</button>
+                                    <button onClick={() => { setTargetCat(ci); setEditingSkill(null); setSkillForm({ name: '', pct: 80 }); setShowSkillForm(true); }}
+                                        className="px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400">+ Skill</button>
+                                    <button onClick={() => delCat(ci)}
+                                        className="px-3 py-1 rounded-lg text-xs font-medium bg-red-500/20 text-red-400">Del</button>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {cat.items && cat.items.map((sk, si) => (
+                                    <div key={si} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/50 text-xs">
+                                        <span className="text-slate-300">{sk.name}</span>
+                                        <span className="text-primary font-mono">{sk.pct}%</span>
+                                        <button onClick={() => { setTargetCat(ci); setEditingSkill(si); setSkillForm({ name: sk.name, pct: sk.pct }); setShowSkillForm(true); }}
+                                            className="text-blue-400 hover:text-blue-300">E</button>
+                                        <button onClick={() => delSkill(ci, si)}
+                                            className="text-red-400 hover:text-red-300">X</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+
+                    {showCatForm && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowCatForm(false)}>
+                            <div className="glass rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+                                <h3 className="font-heading text-lg font-bold text-white mb-4">{editingCat !== null ? 'Edit' : 'Add'} Category</h3>
+                                <input type="text" value={catForm.name} onChange={e => setCatForm({...catForm, name: e.target.value})}
+                                    placeholder="Category name" className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary" />
+                                <div className="flex gap-3 mt-6">
+                                    <button onClick={saveCat}
+                                        className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">Save</button>
+                                    <button onClick={() => setShowCatForm(false)}
+                                        className="flex-1 py-2.5 rounded-xl text-slate-300 font-semibold bg-slate-800/50 text-sm">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showSkillForm && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowSkillForm(false)}>
+                            <div className="glass rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+                                <h3 className="font-heading text-lg font-bold text-white mb-4">{editingSkill !== null ? 'Edit' : 'Add'} Skill</h3>
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-400 mb-1">Skill Name</label>
+                                        <input type="text" value={skillForm.name} onChange={e => setSkillForm({...skillForm, name: e.target.value})}
+                                            className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-400 mb-1">Proficiency (%)</label>
+                                        <input type="number" min="1" max="100" value={skillForm.pct} onChange={e => setSkillForm({...skillForm, pct: e.target.value})}
+                                            className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white text-sm focus:outline-none focus:border-primary" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-6">
+                                    <button onClick={saveSkill}
+                                        className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary text-sm">Save</button>
+                                    <button onClick={() => setShowSkillForm(false)}
+                                        className="flex-1 py-2.5 rounded-xl text-slate-300 font-semibold bg-slate-800/50 text-sm">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function AdminContactEditor({ data, updateData }) {
+            const c = data.contact || {};
+            const p = data.profile || {};
+            const f = data.footer || {};
+            const [form, setForm] = useState({
+                email: c.email || p.email || '',
+                phone: c.phone || p.phone || '',
+                location: c.location || p.location || '',
+                blurb: c.blurb || '',
+                showForm: c.showForm !== false,
+            });
+            const [footer, setFooter] = useState({ note: f.note || '', showAdminLink: f.showAdminLink !== false });
+
+            useEffect(() => {
+                const cc = data.contact || {};
+                const pp = data.profile || {};
+                setForm({
+                    email: cc.email || pp.email || '', phone: cc.phone || pp.phone || '',
+                    location: cc.location || pp.location || '', blurb: cc.blurb || '',
+                    showForm: cc.showForm !== false,
+                });
+                setFooter({ note: (data.footer || {}).note || '', showAdminLink: (data.footer || {}).showAdminLink !== false });
+            }, [data.contact, data.profile, data.footer]);
+
+            const set = (k) => (v) => setForm(s => ({ ...s, [k]: v }));
+
+            const save = () => {
+                updateData({
+                    ...data,
+                    contact: { ...c, email: form.email, phone: form.phone, location: form.location, blurb: form.blurb, showForm: form.showForm },
+                    profile: { ...p, email: form.email, phone: form.phone, location: form.location },
+                    footer: { ...f, ...footer },
+                    sections: {
+                        ...(data.sections || {}),
+                        contactCard: { ...((data.sections || {}).contactCard || {}), body: form.blurb },
+                    },
+                });
+                showToast('Contact info saved!');
+            };
+
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Contact Info" subtitle="Shown in the contact section and footer">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <AdminField label="Email"><AdminInput type="email" value={form.email} onChange={set('email')} /></AdminField>
+                        <AdminField label="Phone"><AdminInput value={form.phone} onChange={set('phone')} /></AdminField>
+                        <AdminField label="Location"><AdminInput value={form.location} onChange={set('location')} /></AdminField>
+                        <div className="flex items-end pb-1">
+                            <AdminToggle label="Show contact form" hint="Uncheck to hide the form and show contact details only."
+                                checked={form.showForm} onChange={set('showForm')} />
+                        </div>
+                    </div>
+                    <AdminField label="Contact Card Text" hint="The paragraph above your contact details.">
+                        <AdminTextarea value={form.blurb} onChange={set('blurb')} rows={3} />
+                    </AdminField>
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-4">Footer</h3>
+                        <div className="space-y-4">
+                            <AdminField label="Footer Note" hint="Small text at the bottom. Leave blank to hide.">
+                                <AdminInput value={footer.note} onChange={e => setFooter(v => ({ ...v, note: e.target.value }))} />
+                            </AdminField>
+                            <AdminToggle label="Show Admin link in footer" checked={footer.showAdminLink}
+                                onChange={v => setFooter(s => ({ ...s, showAdminLink: v }))} />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminSocialEditor({ data, updateData }) {
+            const p = data.profile || {};
+            const links = p.social || [];
+            const [editing, setEditing] = useState(null);
+            const [showForm, setShowForm] = useState(false);
+            const [custom, setCustom] = useState(false);
+
+            const blank = { label: '', url: '', path: '' };
+
+            const openNew = () => { setEditing({ ...blank }); setCustom(false); setShowForm(true); };
+            const openEdit = (item) => {
+                setEditing({ ...item });
+                // Only treat it as custom when the path is not one of the library icons.
+                setCustom(!SOCIAL_ICON_KEYS.some(k => SOCIAL_ICONS[k].svg === item.path));
+                setShowForm(true);
+            };
+
+            const pickIcon = (key) => {
+                setCustom(false);
+                setEditing(e => ({ ...e, path: SOCIAL_ICONS[key].svg, label: e.label || SOCIAL_ICONS[key].label }));
+            };
+
+            const save = () => {
+                const clean = { label: editing.label || 'Link', url: editing.url || '#', path: editing.path || '' };
+                let next;
+                if (editing._idx !== undefined) next = links.map((s, i) => i === editing._idx ? clean : s);
+                else next = [...links, clean];
+                updateData({ ...data, profile: { ...p, social: next } });
+                setShowForm(false); setEditing(null);
+                showToast('Social link saved!');
+            };
+
+            const del = (i) => {
+                if (!confirm('Delete this link?')) return;
+                updateData({ ...data, profile: { ...p, social: links.filter((_, x) => x !== i) } });
+                showToast('Link deleted!');
+            };
+
+            const move = (i, dir) => {
+                const j = i + dir;
+                if (j < 0 || j >= links.length) return;
+                const next = [...links];
+                const tmp = next[i]; next[i] = next[j]; next[j] = tmp;
+                updateData({ ...data, profile: { ...p, social: next } });
+            };
+
+            return (
+                <div className="space-y-4">
+                    <AdminHeading title="Social Links" subtitle="Shown in the hero, contact section and footer">
+                        <AdminPillButton tone="blue" onClick={openNew}>+ Add Link</AdminPillButton>
+                    </AdminHeading>
+                    {links.length === 0 && <p className="text-sm text-slate-400">No social links yet.</p>}
+                    <div className="space-y-2">
+                        {links.map((s, i) => (
+                            <AdminRow key={i} title={s.label || 'Link'} subtitle={s.url}>
+                                <span className="w-8 h-8 rounded-lg bg-slate-800/60 flex items-center justify-center text-slate-300 flex-shrink-0">
+                                    <SocialIcon path={s.path} size={15} />
+                                </span>
+                                <AdminPillButton tone="slate" onClick={() => move(i, -1)}>&uarr;</AdminPillButton>
+                                <AdminPillButton tone="slate" onClick={() => move(i, 1)}>&darr;</AdminPillButton>
+                                <AdminPillButton tone="blue" onClick={() => openEdit(s)}>Edit</AdminPillButton>
+                                <AdminPillButton tone="red" onClick={() => del(i)}>Del</AdminPillButton>
+                            </AdminRow>
+                        ))}
+                    </div>
+
+                    {showForm && (
+                        <AdminModal title={(editing._idx !== undefined ? 'Edit' : 'Add') + ' Social Link'} onClose={() => setShowForm(false)} wide
+                            footer={<AdminModalActions onSave={save} onCancel={() => setShowForm(false)} />}>
+                            <div className="space-y-4">
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <AdminField label="Label" hint="Used as the accessible name.">
+                                        <AdminInput value={editing.label} onChange={v => setEditing(e => ({ ...e, label: v }))} />
+                                    </AdminField>
+                                    <AdminField label="URL" hint="mailto: works for email links.">
+                                        <AdminInput value={editing.url} onChange={v => setEditing(e => ({ ...e, url: v }))} />
+                                    </AdminField>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">Icon</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {SOCIAL_ICON_KEYS.map(k => {
+                                            const active = editing.path === SOCIAL_ICONS[k].svg;
+                                            return (
+                                                <button key={k} type="button" onClick={() => pickIcon(k)} title={SOCIAL_ICONS[k].label}
+                                                    className={'w-11 h-11 rounded-xl border flex items-center justify-center transition-all ' + (active ? 'border-primary bg-primary/20 text-primary' : 'border-slate-700 bg-slate-800/50 text-slate-400 hover:text-white hover:border-slate-500')}>
+                                                    <SocialIcon path={SOCIAL_ICONS[k].svg} size={17} />
+                                                </button>
+                                            );
+                                        })}
+                                        <button type="button" onClick={() => setCustom(true)} title="Custom SVG"
+                                            className={'w-11 h-11 rounded-xl border flex items-center justify-center transition-all ' + (custom ? 'border-primary bg-primary/20 text-primary' : 'border-slate-700 bg-slate-800/50 text-slate-400 hover:text-white hover:border-slate-500')}>
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                {(custom || !editing.path) && (
+                                    <AdminField label="Custom SVG" hint="Either plain path data, or full inner markup like <circle ... /> for outlined icons.">
+                                        <AdminTextarea value={editing.path || ''} onChange={v => setEditing(e => ({ ...e, path: v }))} rows={4} mono />
+                                    </AdminField>
+                                )}
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                                    <span className="text-xs text-slate-400">Preview</span>
+                                    <a href="javascript:void(0)" onClick={e => e.preventDefault()}
+                                        className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300">
+                                        <SocialIcon path={editing.path} size={18} />
+                                    </a>
+                                    {!editing.path && <span className="text-[11px] text-amber-400">Pick an icon, otherwise this link will show blank.</span>}
+                                </div>
+                            </div>
+                        </AdminModal>
+                    )}
+                </div>
+            );
+        }
+
+        function AdminThemeEditor({ data, updateData }) {
+            const t = data.theme || {};
+            const [form, setForm] = useState({ ...t });
+            useEffect(() => { setForm({ ...(data.theme || {}) }); }, [data.theme]);
+            const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }));
+            const save = () => {
+                updateData({ ...data, theme: { ...t, ...form } });
+                showToast('Theme saved!');
+            };
+            const fonts = ['Inter', 'Space Grotesk', 'JetBrains Mono', 'Poppins', 'Montserrat', 'Raleway', 'Lato', 'Oswald', 'Roboto', 'Manrope', 'Outfit', 'Sora'];
+            const presets = [
+                { name: 'Blue', primary: '#3B82F6', secondary: '#8B5CF6', accent: '#06B6D4' },
+                { name: 'Emerald', primary: '#10B981', secondary: '#0EA5E9', accent: '#84CC16' },
+                { name: 'Sunset', primary: '#F97316', secondary: '#EC4899', accent: '#FACC15' },
+                { name: 'Violet', primary: '#8B5CF6', secondary: '#EC4899', accent: '#6366F1' },
+                { name: 'Crimson', primary: '#EF4444', secondary: '#F97316', accent: '#FBBF24' },
+                { name: 'Teal', primary: '#14B8A6', secondary: '#3B82F6', accent: '#A3E635' },
+            ];
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Theme" subtitle="Brand colours, fonts and default appearance">
+                        <AdminSaveButton onClick={save} />
+                    </AdminHeading>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Colour Presets</label>
+                        <div className="flex flex-wrap gap-2">
+                            {presets.map(pr => (
+                                <button key={pr.name} onClick={() => setForm(f => ({ ...f, primary: pr.primary, secondary: pr.secondary, accent: pr.accent }))}
+                                    className="px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-primary transition-all text-xs flex items-center gap-2">
+                                    <span className="flex">
+                                        <span className="w-3 h-3 rounded-full" style={{ background: pr.primary }} />
+                                        <span className="w-3 h-3 rounded-full -ml-1" style={{ background: pr.secondary }} />
+                                        <span className="w-3 h-3 rounded-full -ml-1" style={{ background: pr.accent }} />
+                                    </span>
+                                    {pr.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-3 gap-4">
+                        <AdminField label="Primary"><AdminColorInput value={form.primary} onChange={set('primary')} /></AdminField>
+                        <AdminField label="Secondary"><AdminColorInput value={form.secondary} onChange={set('secondary')} /></AdminField>
+                        <AdminField label="Accent"><AdminColorInput value={form.accent} onChange={set('accent')} /></AdminField>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <AdminField label="Heading Font">
+                            <select value={form.headingFont || 'Space Grotesk'} onChange={e => set('headingFont')(e.target.value)} className={ADMIN_INPUT}>
+                                {fonts.map(f => <option key={f} value={f} className="bg-slate-900">{f}</option>)}
+                            </select>
+                        </AdminField>
+                        <AdminField label="Body Font">
+                            <select value={form.bodyFont || 'Inter'} onChange={e => set('bodyFont')(e.target.value)} className={ADMIN_INPUT}>
+                                {fonts.map(f => <option key={f} value={f} className="bg-slate-900">{f}</option>)}
+                            </select>
+                        </AdminField>
+                    </div>
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <p className="text-sm text-slate-400 mb-3">Default mode applies to first-time visitors who have not chosen a theme yet.</p>
+                        <div className="flex gap-2">
+                            {['dark', 'light'].map(m => (
+                                <button key={m} onClick={() => setForm(f => ({ ...f, defaultMode: m }))}
+                                    className={'px-4 py-2 rounded-xl text-sm font-medium transition-all ' + ((form.defaultMode || 'dark') === m ? 'bg-primary/20 text-primary' : 'bg-slate-800/50 text-slate-400 hover:text-white')}>
+                                    {m === 'dark' ? 'Dark' : 'Light'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminMessages() {
+            const [msgs, setMsgs] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('messages') || '[]'); } catch { return []; }
+            });
+            const del = (idx) => {
+                const next = msgs.filter((_, i) => i !== idx);
+                setMsgs(next);
+                try { localStorage.setItem('messages', JSON.stringify(next)); } catch {}
+                showToast('Message deleted!');
+            };
+            const clearAll = () => {
+                if (!confirm('Delete all messages?')) return;
+                setMsgs([]);
+                try { localStorage.setItem('messages', '[]'); } catch {}
+                showToast('All messages cleared!');
+            };
+            return (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="font-heading text-xl font-bold text-white">Messages</h2>
+                        {msgs.length > 0 && (
+                            <button onClick={clearAll}
+                                className="px-4 py-2 rounded-xl text-xs font-medium bg-red-500/20 text-red-400">
+                                Clear All
+                            </button>
+                        )}
+                    </div>
+                    {msgs.length === 0 && <p className="text-sm text-slate-400">No messages yet. Contact form submissions will appear here.</p>}
+                    <div className="space-y-3">
+                        {msgs.map((m, i) => (
+                            <div key={i} className="glass rounded-xl p-4" style={{background:'rgba(255,255,255,0.03)'}}>
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-3 flex-wrap">
+                                            <span className="text-sm font-semibold text-white">{m.name}</span>
+                                            <span className="text-xs text-primary">{m.email}</span>
+                                            {m.subject && <span className="text-xs text-slate-400">{m.subject}</span>}
+                                        </div>
+                                        <p className="text-sm text-slate-300 mt-2">{m.message}</p>
+                                        <p className="text-xs text-slate-500 mt-2">{m.createdAt ? new Date(m.createdAt).toLocaleString() : ''}</p>
+                                    </div>
+                                    <button onClick={() => del(i)}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all flex-shrink-0">Delete</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- persistence helpers ---
+        function downloadFile(filename, text, mime) {
+            const blob = new Blob([text], { type: mime || 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 200);
+        }
+
+        // Locates the DEFAULT_DATA object literal by bracket matching (ignores
+        // braces inside strings) and swaps it for the supplied data.
+        // Only ever looks inside <script type="text/babel"> blocks, and requires
+        // an object literal to follow, so string literals and Babel's injected
+        // compiled copy of the source elsewhere in the document are ignored.
+        function bakeDataIntoHtml(html, newData) {
+            const marker = 'const DEFAULT_DATA = {';
+            const scriptRe = /<script type="text\/babel">/g;
+            // Built from parts: a literal closing script tag here would end
+            // this very script block when the HTML is parsed.
+            const scriptClose = '<' + '/script>';
+            let sm;
+            while ((sm = scriptRe.exec(html)) !== null) {
+                const regionStart = sm.index + sm[0].length;
+                const regionEnd = html.indexOf(scriptClose, regionStart);
+                if (regionEnd === -1) continue;
+                const start = html.indexOf(marker, regionStart);
+                if (start === -1 || start > regionEnd) continue;
+
+                const objStart = start + marker.length - 1;
+                let depth = 0, i = objStart, inStr = false, quote = '', esc = false;
+                for (; i < regionEnd; i++) {
+                    const ch = html[i];
+                    if (inStr) {
+                        if (esc) { esc = false; continue; }
+                        if (ch === '\\') { esc = true; continue; }
+                        if (ch === quote) inStr = false;
+                        continue;
+                    }
+                    if (ch === '"' || ch === "'" || ch === '`') { inStr = true; quote = ch; continue; }
+                    if (ch === '{') depth++;
+                    else if (ch === '}') { depth--; if (depth === 0) { i++; break; } }
+                }
+                if (depth !== 0) continue;
+
+                // Sanity check: a real object literal should be followed by ';'
+                const after = html.slice(i, i + 40).match(/^\s*;/);
+                if (!after) continue;
+
+                return html.slice(0, objStart) + JSON.stringify(newData, null, 4) + html.slice(i);
+            }
+            throw new Error('Could not find the DEFAULT_DATA block in the HTML.');
+        }
+
+        // Builds a clean source file from the live DOM. Needed when the page was
+        // opened straight from disk, where the browser blocks reading the file.
+        // Undoes everything the running app did to the document.
+        function buildHtmlFromDom() {
+            const clone = document.documentElement.cloneNode(true);
+
+            clone.querySelectorAll('script').forEach(function (s) {
+                const parent = s.parentNode;
+                const inHead = parent && parent.nodeName === 'HEAD';
+                const text = s.textContent || '';
+                // Babel injects a compiled copy of the source into <head>
+                if (inHead && text.indexOf('DEFAULT_DATA') !== -1) s.remove();
+            });
+
+            const root = clone.querySelector('#root');
+            if (root) root.innerHTML = '';
+
+            const toast = clone.querySelector('#toast');
+            if (toast) { toast.className = 'toast glass-card'; toast.textContent = ''; }
+
+            // The loader is hidden by a class once React mounts; start it visible again.
+            const loading = clone.querySelector('#loadingScreen');
+            if (loading) loading.className = '';
+
+            // The error overlay is hidden by an inline style, not a class.
+            const errorScreen = clone.querySelector('#errorScreen');
+            if (errorScreen) {
+                errorScreen.setAttribute('style', 'display:none;');
+                const msg = errorScreen.querySelector('#errorMsg');
+                if (msg) msg.textContent = '';
+            }
+
+            return '<!DOCTYPE html>\n' + clone.outerHTML;
+        }
+
+        function AdminDataManager({ data, updateData }) {
+            const [busy, setBusy] = useState('');
+            const [status, setStatus] = useState(null);
+            const fileRef = useRef();
+
+            const exportJSON = () => {
+                downloadFile('portfolio-data.json', JSON.stringify(data, null, 4), 'application/json');
+                setStatus({ type: 'ok', text: 'portfolio-data.json downloaded.' });
+                showToast('Data exported!');
+            };
+
+            const copyJSON = () => {
+                const text = JSON.stringify(data, null, 4);
+                const done = () => { setStatus({ type: 'ok', text: 'Copied to clipboard.' }); showToast('Copied to clipboard!'); };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done).catch(() => fallback());
+                } else fallback();
+                function fallback() {
+                    const ta = document.createElement('textarea');
+                    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                    document.body.appendChild(ta); ta.select();
+                    try { document.execCommand('copy'); done(); }
+                    catch (e) { setStatus({ type: 'err', text: 'Could not copy. Use Export instead.' }); }
+                    ta.remove();
+                }
+            };
+
+            const importJSON = (file) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const parsed = JSON.parse(String(reader.result));
+                        if (!parsed || typeof parsed !== 'object') throw new Error('Not a valid data object.');
+                        updateData(deepMerge(data, parsed));
+                        setStatus({ type: 'ok', text: 'Imported and merged into your site data.' });
+                        showToast('Data imported!');
+                    } catch (e) {
+                        setStatus({ type: 'err', text: 'Import failed: ' + e.message });
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            const downloadHTML = async () => {
+                setBusy('html');
+                setStatus(null);
+                try {
+                    let html = null;
+                    let fromDOM = false;
+                    try {
+                        const res = await fetch(window.location.href, { cache: 'no-store' });
+                        if (res.ok) html = await res.text();
+                    } catch (e) { html = null; }
+                    if (!html) {
+                        fromDOM = true;
+                        html = buildHtmlFromDom();
+                    }
+                    const out = bakeDataIntoHtml(html, data);
+                    downloadFile('index.html', out, 'text/html');
+                    setStatus({
+                        type: fromDOM ? 'warn' : 'ok',
+                        text: fromDOM
+                            ? 'index.html downloaded. Your browser blocked reading the original file, so it was rebuilt from the live page (compiled duplicates and runtime markup removed).'
+                            : 'index.html downloaded with your data baked in as the new defaults.',
+                    });
+                    showToast('index.html downloaded!');
+                } catch (e) {
+                    setStatus({ type: 'err', text: 'Could not build the file: ' + e.message });
+                }
+                setBusy('');
+            };
+
+            const clearOverride = () => {
+                if (!confirm('Clear the data saved in this browser? The site will fall back to the defaults baked into the file.')) return;
+                try {
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem('portfolio-theme');
+                } catch {}
+                window.location.reload();
+            };
+
+            const resetDefaults = () => {
+                if (!confirm('Reset every section back to the original defaults? This cannot be undone.')) return;
+                updateData(DEFAULT_DATA);
+                setStatus({ type: 'ok', text: 'All sections reset to defaults. Download the file to make it permanent.' });
+                showToast('Reset to defaults!');
+            };
+
+            const counts = [
+                ['Projects', (data.projects || []).length],
+                ['Skills', (data.skills || []).reduce((n, c) => n + ((c.items || []).length), 0)],
+                ['Education', (data.education || []).length],
+                ['Achievements', (data.achievements || []).length],
+                ['Interests', (data.interests || []).length],
+                ['Stats', (data.stats || []).length],
+                ['Social links', ((data.profile || {}).social || []).length],
+            ];
+
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Backup & Export" subtitle="Your edits live in this browser only. Save them somewhere safe." />
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-1">Current Contents</h3>
+                        <div className="flex flex-wrap gap-2 mt-3">
+                            {counts.map(([label, n]) => (
+                                <span key={label} className="px-2.5 py-1 rounded-lg bg-slate-800/60 text-xs text-slate-300">
+                                    {label}: <span className="text-primary font-semibold">{n}</span>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {status && (
+                        <div className={'px-4 py-3 rounded-xl text-sm ' + (status.type === 'err' ? 'bg-red-500/10 text-red-300 border border-red-500/30' : status.type === 'warn' ? 'bg-amber-500/10 text-amber-200 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30')}>
+                            {status.text}
+                        </div>
+                    )}
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-1">Save Permanently</h3>
+                        <p className="text-sm text-slate-400 mb-4">
+                            Downloads a copy of <span className="font-mono text-slate-300">index.html</span> with your current content written
+                            into it as the built-in defaults. Replace the original file with it and your changes are permanent and visible to
+                            every visitor.
+                        </p>
+                        <button onClick={downloadHTML} disabled={busy === 'html'}
+                            className="px-5 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all text-sm disabled:opacity-60">
+                            {busy === 'html' ? 'Building...' : 'Download Updated index.html'}
+                        </button>
+                        <p className="text-[11px] text-slate-500 mt-3">
+                            Tip: if you opened this file directly from disk, the browser blocks reading the original source. Run a local server
+                            (for example <span className="font-mono">npx serve</span>) for a byte-perfect download.
+                        </p>
+                    </div>
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-1">Export / Import JSON</h3>
+                        <p className="text-sm text-slate-400 mb-4">Move your content between browsers, devices or backups.</p>
+                        <div className="flex flex-wrap gap-2">
+                            <AdminPillButton tone="blue" onClick={exportJSON}>Export JSON</AdminPillButton>
+                            <AdminPillButton tone="blue" onClick={copyJSON}>Copy to Clipboard</AdminPillButton>
+                            <AdminPillButton tone="green" onClick={() => fileRef.current && fileRef.current.click()}>Import JSON</AdminPillButton>
+                            <input ref={fileRef} type="file" accept="application/json,.json" className="hidden"
+                                onChange={e => { const f = e.target.files && e.target.files[0]; if (f) importJSON(f); e.target.value = ''; }} />
+                        </div>
+                    </div>
+
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-4">Danger Zone</h3>
+                        <div className="space-y-3">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="min-w-0">
+                                    <p className="text-sm text-slate-200">Clear browser data</p>
+                                    <p className="text-[11px] text-slate-500">Discards this browser's saved copy so the file's baked-in defaults are used.</p>
+                                </div>
+                                <AdminSaveButton variant="ghost" label="Clear" onClick={clearOverride} />
+                            </div>
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="min-w-0">
+                                    <p className="text-sm text-slate-200">Reset all content</p>
+                                    <p className="text-[11px] text-slate-500">Restores every section to the original defaults.</p>
+                                </div>
+                                <AdminSaveButton variant="danger" label="Reset to Defaults" onClick={resetDefaults} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminSettings() {
+            const [auth, setAuth] = useState(loadAdmin() || { username: 'admin', password: 'admin123' });
+            const [f, setF] = useState({ username: auth.username, password: '', confirm: '' });
+            const [msg, setMsg] = useState('');
+            const saveAuth = () => {
+                if (f.password && f.password !== f.confirm) { setMsg('Passwords do not match.'); return; }
+                if (!f.username.trim()) { setMsg('Username cannot be empty.'); return; }
+                if (f.password && f.password.length < 6) { setMsg('Use at least 6 characters.'); return; }
+                const updated = { username: f.username.trim(), password: f.password || auth.password };
+                setAuth(updated);
+                saveAdmin(updated);
+                setF({ ...f, password: '', confirm: '' });
+                setMsg('');
+                showToast('Credentials updated!');
+            };
+            return (
+                <div className="space-y-6">
+                    <AdminHeading title="Settings" subtitle="Admin sign-in credentials" />
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-4">Admin Credentials</h3>
+                        {msg && <p className="text-red-400 text-sm mb-3">{msg}</p>}
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <AdminField label="Username">
+                                <AdminInput value={f.username} onChange={e => setF({ ...f, username: e.target.value })} />
+                            </AdminField>
+                            <AdminField label="New Password" hint="Leave blank to keep current.">
+                                <AdminInput type="password" value={f.password} onChange={e => setF({ ...f, password: e.target.value })} />
+                            </AdminField>
+                            <AdminField label="Confirm Password">
+                                <AdminInput type="password" value={f.confirm} onChange={e => setF({ ...f, confirm: e.target.value })} />
+                            </AdminField>
+                        </div>
+                        <div className="mt-4">
+                            <AdminSaveButton onClick={saveAuth} label="Update Credentials" />
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-4">
+                            Credentials are stored in this browser only. Anyone with the file can still read them, so keep them private and
+                            change them if the site is published.
+                        </p>
+                    </div>
+                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-2">About the Admin Panel</h3>
+                        <p className="text-sm text-slate-400">
+                            Open the panel at <span className="font-mono text-slate-300">index.html#admin</span>. The default sign-in is
+                            <span className="font-mono text-slate-300"> admin / admin123</span> &mdash; change it here before publishing.
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        function PublicPortfolio() {
+            return (
+                <div className="relative">
+                    <Navbar />
+                    <Hero />
+                    <About />
+                    <Skills />
+                    <Projects />
+                    <Education />
+                    <Achievements />
+                    <ContactSection />
+                    <Footer />
+                </div>
+            );
+        }
+
+        // === APP ===
+        function App() {
+            const [data, setDataState] = useState(getData);
+            const [theme, setTheme] = useState(() => {
+                const mode = (DEFAULT_DATA.theme && DEFAULT_DATA.theme.defaultMode) || 'dark';
+                try { return localStorage.getItem('portfolio-theme') || mode; } catch { return mode; }
+            });
+            const [page, setPage] = useState('portfolio');
+            const [dataVersion, setDataVersion] = useState(0);
+
+            const updateData = useCallback((newData) => {
+                setDataState(newData);
+                saveData(newData);
+                setDataVersion(v => v + 1);
+            }, []);
+
+            useEffect(() => {
+                const root = document.documentElement;
+                if (theme === 'dark') { root.classList.add('dark'); root.classList.remove('light'); }
+                else { root.classList.remove('dark'); root.classList.add('light'); }
+                try { localStorage.setItem('portfolio-theme', theme); } catch {}
+            }, [theme]);
+
+            // Apply SEO / meta tags from editable data
+            useEffect(() => {
+                const s = data.site || {};
+                const setMeta = (sel, attr, value) => {
+                    if (!value) return;
+                    let el = document.head.querySelector(sel);
+                    if (!el) { el = document.createElement('meta'); document.head.appendChild(el); }
+                    el.setAttribute(attr, value);
+                };
+                if (s.title) document.title = s.title;
+                setMeta('meta[name="description"]', 'content', s.description);
+                setMeta('meta[name="keywords"]', 'content', s.keywords);
+                setMeta('meta[property="og:title"]', 'content', s.ogTitle);
+                setMeta('meta[property="og:description"]', 'content', s.ogDescription);
+            }, [data.site]);
+
+            // Apply brand colours + fonts live (Tailwind Play CDN re-scans the DOM)
+            useEffect(() => {
+                const t = data.theme || {};
+                const root = document.documentElement.style;
+                if (t.primary) root.setProperty('--primary', t.primary);
+                if (t.secondary) root.setProperty('--secondary', t.secondary);
+                if (t.accent) root.setProperty('--accent', t.accent);
+                if (window.tailwind && t.primary && t.secondary && t.accent) {
+                    try {
+                        window.tailwind.config.theme.extend.colors.primary = t.primary;
+                        window.tailwind.config.theme.extend.colors.secondary = t.secondary;
+                        window.tailwind.config.theme.extend.colors.accent = t.accent;
+                    } catch (e) {}
+                }
+                if (t.headingFont) {
+                    const link = document.getElementById('fontHeadingLink');
+                    if (link) link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(t.headingFont).replace(/%20/g, '+') + ':wght@400;500;600;700;800&display=swap';
+                }
+                if (t.bodyFont) {
+                    const link = document.getElementById('fontBodyLink');
+                    if (link) link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(t.bodyFont).replace(/%20/g, '+') + ':wght@300;400;500;600;700;800&display=swap';
+                }
+            }, [data.theme]);
+
+            useEffect(() => {
+                const onHash = () => {
+                    const hash = window.location.hash;
+                    if (hash === '#admin') {
+                        setPage('admin-login');
+                    } else if (hash === '#admin/dashboard') {
+                        if (loadAdmin()) setPage('admin-dashboard');
+                        else { window.location.hash = '#admin'; }
+                    } else {
+                        setPage('portfolio');
+                    }
+                };
+                onHash();
+                window.addEventListener('hashchange', onHash);
+                return () => window.removeEventListener('hashchange', onHash);
+            }, []);
+
+            const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), []);
+            const handleLogin = () => { window.location.hash = 'admin/dashboard'; };
+            const handleLogout = () => { window.location.hash = ''; };
+
+            useScrollProgress();
+            useParticles();
+
+            return (
+                <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                    <DataContext.Provider value={{ data, updateData }}>
+                        {page === 'admin-login' && <AdminLogin onLogin={handleLogin} />}
+                        {page === 'admin-dashboard' && <AdminDashboard onLogout={handleLogout} />}
+                        {page === 'portfolio' && <PublicPortfolio />}
+                    </DataContext.Provider>
+                </ThemeContext.Provider>
+            );
+        }
+
+        // === RENDER ===
+        try {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(React.createElement(App));
+        } catch (err) {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            var es = document.getElementById('errorScreen');
+            var em = document.getElementById('errorMsg');
+            if (es && em) {
+                em.textContent = err.stack || err.message || String(err);
+                es.style.display = 'flex';
+                es.style.alignItems = 'center';
+                es.style.justifyContent = 'center';
+                es.style.flexDirection = 'column';
+            }
+        }
+    </script>
+</body>
+</html>
