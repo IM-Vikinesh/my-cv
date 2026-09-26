@@ -1,7 +1,5 @@
 import { AppError, db, fail, readJsonBody, readSession, sendJson } from './_lib.js';
 
-const ROW_ID = 'site';
-
 export default async function handler(req, res) {
   try {
     const method = req.method;
@@ -10,17 +8,17 @@ export default async function handler(req, res) {
       return sendJson(res, 405, { error: 'Use GET or PUT.' });
     }
 
-    // Reject unauthenticated writes before spending a database connection on them.
+    // Reject unauthenticated writes before spending a Firestore call on them.
     if (method === 'PUT') readSession(req);
 
-    const sql = await db();
+    const store = await db();
 
     if (method === 'GET') {
       // Portfolio content is public by definition, so this is unauthenticated.
       // `no-store` (see vercel.json) keeps the Vercel edge from serving a stale copy.
-      const { rows } = await sql`SELECT payload, updated_at FROM portfolio_state WHERE id = ${ROW_ID}`;
-      if (!rows.length) return sendJson(res, 200, { data: null, updatedAt: null });
-      return sendJson(res, 200, { data: rows[0].payload, updatedAt: rows[0].updated_at });
+      const row = await store.getData();
+      if (!row) return sendJson(res, 200, { data: null, updatedAt: null });
+      return sendJson(res, 200, { data: row.data, updatedAt: row.updatedAt });
     }
 
     const body = await readJsonBody(req);
@@ -32,14 +30,8 @@ export default async function handler(req, res) {
       throw new AppError(413, 'Site content is too large to store.');
     }
 
-    const { rows } = await sql`
-      INSERT INTO portfolio_state (id, payload, updated_at)
-      VALUES (${ROW_ID}, ${sql.json(data)}, now())
-      ON CONFLICT (id) DO UPDATE
-        SET payload = EXCLUDED.payload, updated_at = now()
-      RETURNING updated_at
-    `;
-    return sendJson(res, 200, { ok: true, updatedAt: rows[0].updated_at });
+    const { updatedAt } = await store.setData(data);
+    return sendJson(res, 200, { ok: true, updatedAt });
   } catch (err) {
     return fail(res, err);
   }

@@ -107,51 +107,154 @@ export function verifyPassword(candidate, expected) {
   return crypto.timingSafeEqual(a, b);
 }
 
-/* --------------------------------- database ------------------------------- */
-// `@vercel/postgres` is created lazily so a missing database surfaces as a
-// clear 503 instead of a module-load crash on every route.
+/* -------------------------------- firebase -------------------------------- */
+// Firestore is only ever reached through these functions using the Admin SDK,
+// which bypasses Firestore security rules. The service account never reaches
+// the browser, and the rules can stay completely closed.
 
-let dbPromise = null;
+let storePromise = null;
 
-async function connect() {
-  if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
-    throw new AppError(
-      503,
-      'No database connected. Create a Postgres database in the Vercel project, link it, then redeploy.'
-    );
+function normaliseKey(value) {
+  // A private key pasted into a single-line env var arrives with literal
+  // backslash-n sequences instead of real newlines.
+  return String(value || '').replace(/\\n/g, '\n');
+}
+
+function serviceAccount() {
+  const raw = (process.env.FIREBASE_SERVICE_ACCOUNT || '').trim();
+  if (raw) {
+    let json;
+    try {
+      json = raw.startsWith('{') ? JSON.parse(raw) : JSON.parse(Buffer.from(raw, 'base64').toString('utf8'));
+    } catch (e) {
+      throw new AppError(500, 'FIREBASE_SERVICE_ACCOUNT is set but is not valid JSON.');
+    }
+    const sa = {
+      projectId: json.project_id || json.projectId,
+      clientEmail: json.client_email || json.clientEmail,
+      privateKey: normaliseKey(json.private_key || json.privateKey),
+    };
+    if (sa.projectId && sa.clientEmail && sa.privateKey) return sa;
+    throw new AppError(500, 'FIREBASE_SERVICE_ACCOUNT is missing project_id, client_email or private_key.');
   }
-  const { sql } = await import('@vercel/postgres');
-  return sql;
+
+  const projectId = (process.env.FIREBASE_PROJECT_ID || '').trim();
+  const clientEmail = (process.env.FIREBASE_CLIENT_EMAIL || '').trim();
+  const privateKey = normaliseKey(process.env.FIREBASE_PRIVATE_KEY);
+  if (projectId && clientEmail && privateKey) return { projectId, clientEmail, privateKey };
+
+  throw new AppError(
+    503,
+    'Firebase is not connected. Add the service account as FIREBASE_SERVICE_ACCOUNT in Vercel, then redeploy.'
+  );
+}
+
+function toIso(value) {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value.toDate === 'function') return value.toDate().toISOString();
+  if (typeof value._seconds === 'number') return new Date(value._seconds * 1000).toISOString();
+  return null;
+}
+
+async function buildStore() {
+  const [{ initializeApp, cert, getApps, getApp }, { getFirestore, FieldValue }] = await Promise.all([
+    import('firebase-admin/app'),
+    import('firebase-admin/firestore'),
+  ]);
+
+  const sa = serviceAccount();
+  const app = getApps().length ? getApp() : initializeApp({ credential: cert(sa) });
+  const db = getFirestore(app);
+
+  const siteRef = db.collection('portfolio').doc('site');
+  const messages = db.collection('portfolioMessages');
+
+  return {
+    async getData() {
+      const snap = await siteRef.get();
+      if (!snap.exists) return null;
+      const value = snap.data() || {};
+      return { data: value.data ?? null, updatedAt: toIso(value.updatedAt) };
+    },
+
+    async setData(data) {
+      await siteRef.set({ data, updatedAt: FieldValue.serverTimestamp() });
+      // Read back so the client stores the exact stamp later polls compare to.
+      // Firestore can briefly hand back an unresolved server timestamp on a
+      // read-after-write, so fall back rather than returning null: the client
+      // treats a null stamp as "unknown" and would re-apply once per poll.
+      const snap = await siteRef.get();
+      const readBack = toIso((snap.data() || {}).updatedAt);
+      return { updatedAt: readBack || new Date().toISOString() };
+    },
+
+    async listMessages() {
+      const snap = await messages.orderBy('createdAt', 'desc').limit(MAX_MESSAGES).get();
+      return snap.docs.map((docSnap) => {
+        const value = docSnap.data() || {};
+        return {
+          id: docSnap.id,
+          name: value.name || '',
+          email: value.email || '',
+          subject: value.subject || '',
+          message: value.message || '',
+          createdAt: toIso(value.createdAt),
+        };
+      });
+    },
+
+    async addMessages(list) {
+      const batch = db.batch();
+      for (const message of list) {
+        batch.set(messages.doc(), { ...message, createdAt: FieldValue.serverTimestamp() });
+      }
+      await batch.commit();
+      await this.trimMessages();
+      return list.length;
+    },
+
+    // Keeps the newest MAX_MESSAGES and drops the rest, so an unattended
+    // contact form cannot grow without bound.
+    async trimMessages() {
+      const stale = await messages.orderBy('createdAt', 'desc').offset(MAX_MESSAGES).limit(200).get();
+      if (stale.empty) return;
+      const batch = db.batch();
+      stale.docs.forEach((docSnap) => batch.delete(docSnap.ref));
+      await batch.commit();
+    },
+
+    async deleteMessage(id) {
+      const ref = messages.doc(String(id));
+      if (!ref.id || ref.path.length > 1500) throw new AppError(400, 'Provide a valid message id.');
+      await ref.delete();
+      return 1;
+    },
+
+    async clearMessages() {
+      let removed = 0;
+      for (;;) {
+        const snap = await messages.orderBy('createdAt', 'desc').limit(400).get();
+        if (snap.empty) break;
+        const batch = db.batch();
+        snap.docs.forEach((docSnap) => batch.delete(docSnap.ref));
+        await batch.commit();
+        removed += snap.size;
+        if (snap.size < 400) break;
+      }
+      return removed;
+    },
+  };
 }
 
 export async function db() {
-  if (!dbPromise) {
-    dbPromise = (async () => {
-      const sql = await connect();
-      await sql`
-        CREATE TABLE IF NOT EXISTS portfolio_state (
-          id          text PRIMARY KEY,
-          payload     jsonb NOT NULL,
-          updated_at  timestamptz NOT NULL DEFAULT now()
-        )
-      `;
-      await sql`
-        CREATE TABLE IF NOT EXISTS portfolio_messages (
-          id          serial PRIMARY KEY,
-          name        text NOT NULL,
-          email       text NOT NULL,
-          subject     text,
-          message     text NOT NULL,
-          created_at  timestamptz NOT NULL DEFAULT now()
-        )
-      `;
-      return sql;
-    })().catch((err) => {
-      dbPromise = null;
+  if (!storePromise) {
+    storePromise = buildStore().catch((err) => {
+      storePromise = null;
       throw err;
     });
   }
-  return dbPromise;
+  return storePromise;
 }
 
 /* ------------------------------ input cleaning ---------------------------- */

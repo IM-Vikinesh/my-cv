@@ -10,25 +10,10 @@ export default async function handler(req, res) {
 
     if (method === 'GET' || method === 'DELETE') readSession(req);
 
-    const sql = await db();
+    const store = await db();
 
     if (method === 'GET') {
-      const { rows } = await sql`
-        SELECT id, name, email, subject, message, created_at
-        FROM portfolio_messages
-        ORDER BY created_at DESC, id DESC
-        LIMIT ${MAX_MESSAGES}
-      `;
-      return sendJson(res, 200, {
-        messages: rows.map((r) => ({
-          id: r.id,
-          name: r.name,
-          email: r.email,
-          subject: r.subject,
-          message: r.message,
-          createdAt: r.created_at,
-        })),
-      });
+      return sendJson(res, 200, { messages: await store.listMessages() });
     }
 
     if (method === 'POST') {
@@ -38,32 +23,18 @@ export default async function handler(req, res) {
       if (incoming.length > MAX_MESSAGES) throw new AppError(400, 'Too many messages in one request.');
 
       const cleaned = incoming.map(cleanMessage);
-      let saved = 0;
-      await sql.begin(async (tx) => {
-        for (const m of cleaned) {
-          await tx`
-            INSERT INTO portfolio_messages (name, email, subject, message)
-            VALUES (${m.name}, ${m.email}, ${m.subject}, ${m.message})
-          `;
-          saved += 1;
-        }
-      });
-      await sql`
-        DELETE FROM portfolio_messages
-        WHERE id NOT IN (SELECT id FROM portfolio_messages ORDER BY created_at DESC, id DESC LIMIT ${MAX_MESSAGES})
-      `;
+      const saved = await store.addMessages(cleaned);
       return sendJson(res, 201, { ok: true, saved });
     }
 
     const body = await readJsonBody(req);
     if (body && body.all === true) {
-      const { rowCount } = await sql`DELETE FROM portfolio_messages`;
-      return sendJson(res, 200, { ok: true, deleted: rowCount });
+      return sendJson(res, 200, { ok: true, deleted: await store.clearMessages() });
     }
-    const id = Number(body && body.id);
-    if (!Number.isInteger(id)) throw new AppError(400, 'Provide a numeric message id.');
-    const { rowCount } = await sql`DELETE FROM portfolio_messages WHERE id = ${id}`;
-    return sendJson(res, 200, { ok: true, deleted: rowCount });
+    if (body && (body.id === undefined || body.id === null || body.id === '')) {
+      throw new AppError(400, 'Provide a message id.');
+    }
+    return sendJson(res, 200, { ok: true, deleted: await store.deleteMessage(body.id) });
   } catch (err) {
     return fail(res, err);
   }
