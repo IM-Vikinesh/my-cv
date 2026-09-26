@@ -30,8 +30,9 @@ bypasses them.
    | Name | Value | Notes |
    | --- | --- | --- |
    | `FIREBASE_SERVICE_ACCOUNT` | the whole downloaded JSON, on one line | The private key must keep its `\n` escapes. |
-   | `ADMIN_TOKEN` | a strong password | This is the admin panel password. |
+   | `ADMIN_TOKEN` | a strong password | The password until you set your own in the panel. |
    | `ADMIN_USER` | `admin` | Optional, this is the default. |
+   | `SESSION_SECRET` | any long random string | Signs session tokens. Set once. |
 
    Apply to **Production** and **Preview**, then redeploy.
 
@@ -53,6 +54,27 @@ bypasses them.
 | --- | --- |
 | `portfolio/site` | One document holding the whole site as JSON, plus `updatedAt`. |
 | `portfolioMessages` | One document per contact-form submission. Newest 200 are kept. |
+| `config/admin` | The password you set in the panel, as a salted scrypt hash. Absent until you set one. |
+| `loginAttempts` | Per-address failed sign-in counters. The address is hashed, not stored. |
+
+## Changing the password
+
+**Admin &rarr; Settings** has a form for it. You need to be signed in and to type the
+current password. The new password is stored only as a salted scrypt hash, never in
+plain text, and it is never sent to the browser.
+
+Two things worth knowing:
+
+- `ADMIN_TOKEN` in Vercel is only the **starting** password. The moment you change it in
+  the panel, the panel becomes the source of truth and editing `ADMIN_TOKEN` has no
+  effect. To go back to env-var control, delete the `config/admin` document in Firestore,
+  which restores `ADMIN_TOKEN`.
+- `SESSION_SECRET` is separate on purpose: changing your password does **not** sign your
+  other devices out. Only changing `SESSION_SECRET` (or waiting out the 14-day session)
+  does that.
+
+Sign-in is rate limited to 8 wrong attempts per address, after which that address is
+locked out for 15 minutes. A successful sign-in clears the counter.
 
 ## What changed
 
@@ -75,7 +97,7 @@ site still renders and the panel shows the reason instead of silently losing you
 
 ## Changing the password later
 
-Update `ADMIN_TOKEN` in Vercel and redeploy. Every device will be asked to sign in again.
+Use **Admin &rarr; Settings** in the panel. See above for the details.
 
 ## Local development
 

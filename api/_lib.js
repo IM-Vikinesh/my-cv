@@ -34,11 +34,18 @@ export function adminUser() {
   return (process.env.ADMIN_USER || 'admin').trim();
 }
 
+// Signs sessions. Deliberately separate from the password: once the owner
+// changes their password in Firestore, existing sessions must stay valid, so
+// the two secrets cannot be the same value.
+export function sessionSecret() {
+  return (process.env.SESSION_SECRET || '').trim() || adminToken();
+}
+
 export function requireConfigured() {
-  if (!adminToken()) {
+  if (!sessionSecret()) {
     throw new AppError(
       503,
-      'Admin access is not configured. Set the ADMIN_TOKEN environment variable in Vercel and redeploy.'
+      'Admin access is not configured. Set SESSION_SECRET (and ADMIN_TOKEN) in Vercel and redeploy.'
     );
   }
 }
@@ -57,7 +64,7 @@ function unb64url(input) {
 }
 
 function sign(payload) {
-  return crypto.createHmac('sha256', adminToken()).update(payload).digest('base64url');
+  return crypto.createHmac('sha256', sessionSecret()).update(payload).digest('base64url');
 }
 
 export function createSession(username) {
@@ -105,6 +112,109 @@ export function verifyPassword(candidate, expected) {
   const b = Buffer.from(String(expected ?? ''));
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
+}
+
+/* ---------------------------- password storage --------------------------- */
+// The owner can set their own password from the admin panel, so it cannot live
+// in an environment variable. It is stored in Firestore as a salted scrypt
+// hash: if somebody ever reads the database they get a hash, not a password.
+
+const SCRYPT = { N: 16384, r: 8, p: 1 };
+
+export const MIN_PASSWORD_LENGTH = 8;
+
+export function hashSecret(value) {
+  const salt = crypto.randomBytes(16);
+  const hash = crypto.scryptSync(String(value), salt, 64, SCRYPT);
+  return { algo: 'scrypt', salt: salt.toString('base64'), hash: hash.toString('base64') };
+}
+
+export function verifySecret(candidate, record) {
+  if (!record || record.algo !== 'scrypt' || !record.salt || !record.hash) return false;
+  let expected;
+  try {
+    expected = Buffer.from(record.hash, 'base64');
+  } catch {
+    return false;
+  }
+  if (!expected.length) return false;
+  let actual;
+  try {
+    actual = crypto.scryptSync(String(candidate ?? ''), Buffer.from(record.salt, 'base64'), expected.length, SCRYPT);
+  } catch {
+    return false;
+  }
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
+
+export function checkPasswordPolicy(password) {
+  const value = String(password ?? '');
+  if (value.length < MIN_PASSWORD_LENGTH) {
+    throw new AppError(400, 'Use at least ' + MIN_PASSWORD_LENGTH + ' characters.');
+  }
+  if (value.length > 200) {
+    throw new AppError(400, 'That password is too long.');
+  }
+  if (value === adminUser()) {
+    throw new AppError(400, 'The password cannot be the same as your username.');
+  }
+  return value;
+}
+
+// Prefers the password the owner set in the panel, and falls back to
+// ADMIN_TOKEN until they set one. If Firestore is unreachable the fallback
+// still applies, so a database outage cannot lock the owner out.
+export async function verifyPasswordCandidate(candidate) {
+  let record = null;
+  try {
+    record = await (await db()).getAdminCredential();
+  } catch {
+    record = null;
+  }
+  if (record) return verifySecret(candidate, record);
+  return verifyPassword(candidate, adminToken());
+}
+
+/* --------------------------- brute-force throttling ---------------------- */
+// A password the owner chose may be weaker than a generated one, so repeated
+// failures are counted per address and temporarily locked out. The address is
+// hashed, so no visitor IP is stored in plain text.
+
+const MAX_ATTEMPTS = 8;
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
+const LOCK_MS = 15 * 60 * 1000;
+
+export function clientKey(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  const raw = (typeof forwarded === 'string' ? forwarded.split(',')[0] : '') || (req.socket && req.socket.remoteAddress) || 'unknown';
+  return crypto.createHash('sha256').update(String(raw).trim()).digest('base64url').slice(0, 32);
+}
+
+export async function lockoutRemaining(req) {
+  let attempt = null;
+  try {
+    attempt = await (await db()).getLoginAttempt(clientKey(req));
+  } catch {
+    return 0;
+  }
+  if (!attempt || !attempt.lockedUntil) return 0;
+  return Math.max(0, attempt.lockedUntil - Date.now());
+}
+
+export async function noteFailedAttempt(req) {
+  try {
+    await (await db()).noteLoginFailure(clientKey(req), MAX_ATTEMPTS, ATTEMPT_WINDOW_MS, LOCK_MS);
+  } catch {
+    /* throttling is best-effort; never block a legitimate sign-in on it */
+  }
+}
+
+export async function clearFailedAttempts(req) {
+  try {
+    await (await db()).clearLoginAttempt(clientKey(req));
+  } catch {
+    /* ignore */
+  }
 }
 
 /* -------------------------------- firebase -------------------------------- */
@@ -169,6 +279,8 @@ async function buildStore() {
 
   const siteRef = db.collection('portfolio').doc('site');
   const messages = db.collection('portfolioMessages');
+  const configRef = db.collection('config').doc('admin');
+  const attempts = db.collection('loginAttempts');
 
   return {
     async getData() {
@@ -243,6 +355,38 @@ async function buildStore() {
         if (snap.size < 400) break;
       }
       return removed;
+    },
+
+    // The password the owner set from the admin panel. Absent until they do.
+    async getAdminCredential() {
+      const snap = await configRef.get();
+      return snap.exists ? snap.data() || null : null;
+    },
+
+    async setAdminCredential(record) {
+      await configRef.set({ ...record, updatedAt: FieldValue.serverTimestamp() });
+    },
+
+    async getLoginAttempt(key) {
+      const snap = await attempts.doc(key).get();
+      return snap.exists ? snap.data() || null : null;
+    },
+
+    async noteLoginFailure(key, max, windowMs, lockMs) {
+      const now = Date.now();
+      const current = await this.getLoginAttempt(key);
+      const within = current && now - (current.firstAt || 0) < windowMs;
+      const count = within ? (current.count || 0) + 1 : 1;
+      await attempts.doc(key).set({
+        count,
+        firstAt: within ? current.firstAt : now,
+        lockedUntil: count >= max ? now + lockMs : 0,
+      });
+      return count;
+    },
+
+    async clearLoginAttempt(key) {
+      await attempts.doc(key).delete();
     },
   };
 }

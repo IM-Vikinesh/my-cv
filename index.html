@@ -3083,6 +3083,37 @@
 
         function AdminSettings() {
             const session = loadAdmin();
+            const [current, setCurrent] = useState('');
+            const [next, setNext] = useState('');
+            const [confirm, setConfirm] = useState('');
+            const [busy, setBusy] = useState(false);
+            const [msg, setMsg] = useState(null);
+
+            const mismatch = confirm.length > 0 && next !== confirm;
+            const tooShort = next.length > 0 && next.trim().length < 8;
+            const canSubmit = !busy && current.length > 0 && next.length > 0 && next === confirm && next.trim().length >= 8;
+
+            const submit = async (e) => {
+                e.preventDefault();
+                if (!canSubmit) return;
+                setBusy(true);
+                setMsg(null);
+                try {
+                    const res = await api('/api/auth', {
+                        method: 'POST',
+                        body: { action: 'change-password', currentPassword: current, newPassword: next }
+                    });
+                    setCurrent(''); setNext(''); setConfirm('');
+                    setMsg({ tone: 'ok', text: res.message || 'Password updated.' });
+                    showToast('Password updated');
+                } catch (ex) {
+                    setMsg({ tone: 'err', text: ex.message || 'Could not change the password.' });
+                } finally {
+                    setBusy(false);
+                }
+            };
+
+            const field = 'w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary';
 
             return (
                 <div className="space-y-6">
@@ -3094,18 +3125,52 @@
                             {session && <> &middot; session valid until {new Date(session.expiresAt).toLocaleString()}</>}
                         </p>
                         <p className="text-[11px] text-slate-500 mt-3">
-                            The password is no longer stored in this page. It is checked by the server against an environment variable,
-                            so visitors cannot read it by viewing the source.
+                            The password is never stored in this page. It is checked by the server, and only as a
+                            salted hash held in the database, so visitors cannot read it by viewing the source.
                         </p>
                     </div>
-                    <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
-                        <h3 className="font-heading text-base font-semibold text-white mb-2">Changing the password</h3>
-                        <ol className="text-sm text-slate-400 space-y-2 list-decimal list-inside">
-                            <li>Open your project in Vercel &rarr; <span className="text-slate-300">Settings &rarr; Environment Variables</span>.</li>
-                            <li>Update <span className="font-mono text-slate-300">ADMIN_TOKEN</span> (the password) and optionally <span className="font-mono text-slate-300">ADMIN_USER</span> (defaults to <span className="font-mono text-slate-300">admin</span>).</li>
-                            <li>Redeploy. Every device will need to sign in again.</li>
-                        </ol>
-                    </div>
+
+                    <form onSubmit={submit} className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
+                        <h3 className="font-heading text-base font-semibold text-white mb-1">Change password</h3>
+                        <p className="text-sm text-slate-400 mb-4">
+                            Pick something you will remember. Use at least 8 characters &mdash; a short password is
+                            the easiest way to get locked out of your own site.
+                        </p>
+                        <div className="space-y-3 max-w-sm">
+                            <div>
+                                <label className="block text-xs font-medium text-slate-300 mb-1">Current password</label>
+                                <input type="password" className={field} value={current} autoComplete="current-password"
+                                    onChange={e => setCurrent(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-slate-300 mb-1">New password</label>
+                                <input type="password" className={field} value={next} autoComplete="new-password"
+                                    onChange={e => setNext(e.target.value)} />
+                                {tooShort && <p className="text-[11px] text-amber-400 mt-1">At least 8 characters.</p>}
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-slate-300 mb-1">Confirm new password</label>
+                                <input type="password" className={field} value={confirm} autoComplete="new-password"
+                                    onChange={e => setConfirm(e.target.value)} />
+                                {mismatch && <p className="text-[11px] text-amber-400 mt-1">The two passwords do not match.</p>}
+                            </div>
+                            <button type="submit" disabled={!canSubmit}
+                                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                                {busy ? 'Updating...' : 'Update password'}
+                            </button>
+                            {msg && (
+                                <p className={'text-xs ' + (msg.tone === 'ok' ? 'text-emerald-400' : 'text-red-400')}>
+                                    {msg.text}
+                                </p>
+                            )}
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-4">
+                            Other devices stay signed in until their 14-day session expires. If you ever forget the
+                            new password, it can be reset from the Vercel dashboard by deleting the admin record in
+                            the database, which restores the original one.
+                        </p>
+                    </form>
+
                     <div className={'glass ' + ADMIN_CARD} style={ADMIN_CARD_BG}>
                         <h3 className="font-heading text-base font-semibold text-white mb-2">How to open this panel</h3>
                         <p className="text-sm text-slate-400">
