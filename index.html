@@ -1387,12 +1387,12 @@
             const [err, setErr] = useState('');
 
             useEffect(() => {
-                if (!loadAdmin()) { saveAdmin({ username: 'admin', password: 'admin123' }); }
+                if (!loadAdmin()) { saveAdmin({ username: 'admin', password: 'thuva@2003' }); }
             }, []);
 
             const handle = (e) => {
                 e.preventDefault();
-                const auth = loadAdmin() || { username: 'admin', password: 'admin123' };
+                const auth = loadAdmin() || { username: 'admin', password: 'thuva@2003' };
                 if (u === auth.username && p === auth.password) { onLogin(); }
                 else { setErr('Invalid username or password'); }
             };
@@ -1717,7 +1717,7 @@
                             </AdminField>
                             <div className="space-y-4">
                                 <AdminField label="Button Label" hint="Leave blank to hide the nav button.">
-                                    <AdminInput value={navCta.label} onChange={e => setNavCta(v => ({ ...v, label: e.target.value }))} />
+                                        <AdminInput value={navCta.label} onChange={v => setNavCta(s => ({ ...s, label: v }))} />
                                 </AdminField>
                                 <AdminField label="Button Scrolls To">
                                     <select value={navCta.target} onChange={e => setNavCta(v => ({ ...v, target: e.target.value }))} className={ADMIN_INPUT}>
@@ -2345,7 +2345,7 @@
                         <h3 className="font-heading text-base font-semibold text-white mb-4">Footer</h3>
                         <div className="space-y-4">
                             <AdminField label="Footer Note" hint="Small text at the bottom. Leave blank to hide.">
-                                <AdminInput value={footer.note} onChange={e => setFooter(v => ({ ...v, note: e.target.value }))} />
+                                        <AdminInput value={footer.note} onChange={v => setFooter(s => ({ ...s, note: v }))} />
                             </AdminField>
                             <AdminToggle label="Show Admin link in footer" checked={footer.showAdminLink}
                                 onChange={v => setFooter(s => ({ ...s, showAdminLink: v }))} />
@@ -2365,8 +2365,8 @@
             const blank = { label: '', url: '', path: '' };
 
             const openNew = () => { setEditing({ ...blank }); setCustom(false); setShowForm(true); };
-            const openEdit = (item) => {
-                setEditing({ ...item });
+            const openEdit = (item, idx) => {
+                setEditing({ ...item, _idx: idx });
                 // Only treat it as custom when the path is not one of the library icons.
                 setCustom(!SOCIAL_ICON_KEYS.some(k => SOCIAL_ICONS[k].svg === item.path));
                 setShowForm(true);
@@ -2415,7 +2415,7 @@
                                 </span>
                                 <AdminPillButton tone="slate" onClick={() => move(i, -1)}>&uarr;</AdminPillButton>
                                 <AdminPillButton tone="slate" onClick={() => move(i, 1)}>&darr;</AdminPillButton>
-                                <AdminPillButton tone="blue" onClick={() => openEdit(s)}>Edit</AdminPillButton>
+                                <AdminPillButton tone="blue" onClick={() => openEdit(s, i)}>Edit</AdminPillButton>
                                 <AdminPillButton tone="red" onClick={() => del(i)}>Del</AdminPillButton>
                             </AdminRow>
                         ))}
@@ -2860,7 +2860,7 @@
         }
 
         function AdminSettings() {
-            const [auth, setAuth] = useState(loadAdmin() || { username: 'admin', password: 'admin123' });
+            const [auth, setAuth] = useState(loadAdmin() || { username: 'admin', password: 'thuva@2003' });
             const [f, setF] = useState({ username: auth.username, password: '', confirm: '' });
             const [msg, setMsg] = useState('');
             const saveAuth = () => {
@@ -2882,13 +2882,13 @@
                         {msg && <p className="text-red-400 text-sm mb-3">{msg}</p>}
                         <div className="grid sm:grid-cols-2 gap-4">
                             <AdminField label="Username">
-                                <AdminInput value={f.username} onChange={e => setF({ ...f, username: e.target.value })} />
+                                <AdminInput value={f.username} onChange={v => setF(s => ({ ...s, username: v }))} />
                             </AdminField>
                             <AdminField label="New Password" hint="Leave blank to keep current.">
-                                <AdminInput type="password" value={f.password} onChange={e => setF({ ...f, password: e.target.value })} />
+                                <AdminInput type="password" value={f.password} onChange={v => setF(s => ({ ...s, password: v }))} />
                             </AdminField>
                             <AdminField label="Confirm Password">
-                                <AdminInput type="password" value={f.confirm} onChange={e => setF({ ...f, confirm: e.target.value })} />
+                                <AdminInput type="password" value={f.confirm} onChange={v => setF(s => ({ ...s, confirm: v }))} />
                             </AdminField>
                         </div>
                         <div className="mt-4">
@@ -2903,7 +2903,7 @@
                         <h3 className="font-heading text-base font-semibold text-white mb-2">About the Admin Panel</h3>
                         <p className="text-sm text-slate-400">
                             Open the panel at <span className="font-mono text-slate-300">index.html#admin</span>. The default sign-in is
-                            <span className="font-mono text-slate-300"> admin / admin123</span> &mdash; change it here before publishing.
+                            <span className="font-mono text-slate-300"> admin / thuva@2003</span> &mdash; change it here before publishing.
                         </p>
                     </div>
                 </div>
