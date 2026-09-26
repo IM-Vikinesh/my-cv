@@ -267,6 +267,8 @@
         // === DATA LAYER ===
         const STORAGE_KEY = 'portfolio-data';
         const ADMIN_KEY = 'portfolio-admin';
+        const DEFAULT_AUTH = { username: 'admin', password: 'thuva@2003' };
+        const LEGACY_AUTH = { username: 'admin', password: 'admin123' };
 
         function loadData() {
             try {
@@ -283,7 +285,16 @@
         function loadAdmin() {
             try {
                 const raw = localStorage.getItem(ADMIN_KEY);
-                if (raw) return JSON.parse(raw);
+                if (raw) {
+                    const auth = JSON.parse(raw);
+                    // Browsers that were seeded with the old default still hold the
+                    // legacy password; upgrade them so DEFAULT_AUTH is what works.
+                    if (auth && auth.username === LEGACY_AUTH.username && auth.password === LEGACY_AUTH.password) {
+                        localStorage.setItem(ADMIN_KEY, JSON.stringify(DEFAULT_AUTH));
+                        return { ...DEFAULT_AUTH };
+                    }
+                    return auth;
+                }
             } catch {}
             return null;
         }
@@ -669,6 +680,7 @@
 
             const isDark = theme === 'dark';
             const logoSrc = data.profile.image || 'IMG_20260221_164230.jpg';
+            const logoTilt = Number(data.profile.imageTilt) || 0;
 
             return (
                 <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'dark:bg-[#0F172A]/90 bg-white/90 backdrop-blur-xl shadow-lg dark:shadow-slate-900/50' : 'bg-transparent'}`}>
@@ -676,7 +688,7 @@
                         <div className="flex items-center justify-between h-16 lg:h-20">
                             <button onClick={() => scrollTo('home')} className="flex items-center gap-3 group">
                                 <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-colors">
-                                    <img src={logoSrc} alt="SV" className="w-full h-full object-cover" />
+                                    <img src={logoSrc} alt="SV" className="w-full h-full object-cover" style={{ transform: logoTilt ? `rotate(${logoTilt}deg)` : undefined }} />
                                 </div>
                                 <span className="font-heading font-bold text-lg gradient-text">{data.profile.name}</span>
                             </button>
@@ -822,9 +834,9 @@
                             </div>
 
                             <div className={`hidden lg:flex justify-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                                <div className="relative">
-                                    <div className="w-72 h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10 animate-float">
-                                        <img src={p.image || 'IMG_20260221_164230.jpg'} alt={p.name} className="w-full h-full object-cover" />
+                                <div className="relative animate-float">
+                                    <div className="w-72 h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10">
+                                        <img src={p.image || 'IMG_20260221_164230.jpg'} alt={p.name} className="w-full h-full object-cover" style={{ transform: Number(p.imageTilt) ? `rotate(${p.imageTilt}deg)` : undefined }} />
                                     </div>
                                     {heroStat.value && (
                                         <div className="absolute -bottom-4 -right-4 w-24 h-24 rounded-xl dark:bg-primary/20 bg-primary/10 backdrop-blur-xl border dark:border-primary/30 border-primary/20 flex items-center justify-center">
@@ -1387,12 +1399,12 @@
             const [err, setErr] = useState('');
 
             useEffect(() => {
-                if (!loadAdmin()) { saveAdmin({ username: 'admin', password: 'thuva@2003' }); }
+                if (!loadAdmin()) { saveAdmin({ ...DEFAULT_AUTH }); }
             }, []);
 
             const handle = (e) => {
                 e.preventDefault();
-                const auth = loadAdmin() || { username: 'admin', password: 'thuva@2003' };
+                const auth = loadAdmin() || { ...DEFAULT_AUTH };
                 if (u === auth.username && p === auth.password) { onLogin(); }
                 else { setErr('Invalid username or password'); }
             };
@@ -1575,9 +1587,23 @@
                         <AdminField label="Status Badge" hint="Leave blank to hide the badge in the hero."><AdminInput value={form.status} onChange={set('status')} placeholder="Available for Internships" /></AdminField>
                         <AdminField label="Profile Image" hint="File name in this folder, or a full URL.">
                             <div className="flex items-center gap-3">
-                                <img src={form.image || 'IMG_20260221_164230.jpg'} alt=""
-                                    className="w-12 h-12 rounded-xl object-cover border border-slate-700 bg-slate-800" />
+                                <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-700 bg-slate-800 flex-shrink-0">
+                                    <img src={form.image || 'IMG_20260221_164230.jpg'} alt=""
+                                        className="w-full h-full object-cover"
+                                        style={{ transform: form.imageTilt ? `rotate(${form.imageTilt}deg)` : undefined }} />
+                                </div>
                                 <AdminInput value={form.image} onChange={set('image')} />
+                            </div>
+                        </AdminField>
+                        <AdminField label="Straighten Photo" hint="If your photo looks tilted, nudge this until it sits level. Applies to the hero and the logo.">
+                            <div className="flex items-center gap-3">
+                                <input type="range" min="-15" max="15" step="0.5" value={Number(form.imageTilt) || 0}
+                                    onChange={e => set('imageTilt')(e.target.value)}
+                                    className="flex-1 accent-primary" />
+                                <span className="text-sm font-mono text-slate-300 w-14 text-right">
+                                    {Number(form.imageTilt) > 0 ? '+' : ''}{Number(form.imageTilt) || 0}&deg;
+                                </span>
+                                <AdminPillButton tone="slate" onClick={() => set('imageTilt')(0)}>Reset</AdminPillButton>
                             </div>
                         </AdminField>
                         <AdminField label="Email"><AdminInput type="email" value={form.email} onChange={set('email')} /></AdminField>
@@ -2860,7 +2886,7 @@
         }
 
         function AdminSettings() {
-            const [auth, setAuth] = useState(loadAdmin() || { username: 'admin', password: 'thuva@2003' });
+            const [auth, setAuth] = useState(loadAdmin() || { ...DEFAULT_AUTH });
             const [f, setF] = useState({ username: auth.username, password: '', confirm: '' });
             const [msg, setMsg] = useState('');
             const saveAuth = () => {
