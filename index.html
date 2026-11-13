@@ -166,7 +166,7 @@
         }
 
         /* Light mode overrides */
-        :root.light body, .light body { background: #f8fafc; color: #0f172a; }
+        :root.light body, .light body { background: linear-gradient(135deg in oklch, oklch(97.24% 0.0152 302.34) 0.0%, oklch(94.67% 0.0148 298.88) 2.1%, oklch(91.19% 0.0143 294.24) 4.3%, oklch(87.00% 0.0136 288.66) 6.4%, oklch(82.28% 0.0128 282.39) 8.5%, oklch(77.23% 0.0121 275.66) 10.6%, oklch(72.04% 0.0113 268.71) 12.8%, oklch(66.88% 0.0106 261.80) 14.9%, oklch(61.96% 0.0100 255.16) 17.0%, oklch(57.47% 0.0095 249.04) 19.1%, oklch(53.58% 0.0093 243.67) 21.3%, oklch(50.49% 0.0094 239.30) 23.4%, oklch(48.38% 0.0098 236.14) 25.5%, oklch(47.05% 0.0106 233.69) 27.7%, oklch(46.30% 0.0119 231.69) 29.8%, oklch(46.07% 0.0134 230.15) 31.9%, oklch(46.28% 0.0152 229.09) 34.0%, oklch(46.85% 0.0171 228.49) 36.2%, oklch(47.72% 0.0191 228.39) 38.3%, oklch(48.80% 0.0210 228.78) 40.4%, oklch(50.03% 0.0227 229.66) 42.6%, oklch(51.31% 0.0242 231.06) 44.7%, oklch(52.59% 0.0253 232.97) 46.8%, oklch(53.79% 0.0260 235.41) 48.9%, oklch(54.92% 0.0262 238.39) 51.1%, oklch(56.49% 0.0259 241.97) 53.2%, oklch(58.47% 0.0253 246.14) 55.3%, oklch(60.72% 0.0243 250.87) 57.4%, oklch(63.12% 0.0230 256.11) 59.6%, oklch(65.55% 0.0216 261.84) 61.7%, oklch(67.87% 0.0202 268.02) 63.8%, oklch(69.95% 0.0187 274.62) 66.0%, oklch(71.68% 0.0172 281.60) 68.1%, oklch(72.91% 0.0159 288.94) 70.2%, oklch(73.52% 0.0148 296.60) 72.3%, oklch(73.39% 0.0139 304.54) 74.5%, oklch(72.36% 0.0134 313.11) 76.6%, oklch(70.38% 0.0130 323.02) 78.7%, oklch(67.63% 0.0127 334.01) 80.9%, oklch(64.27% 0.0125 345.74) 83.0%, oklch(60.48% 0.0124 357.90) 85.1%, oklch(56.42% 0.0123 10.17) 87.2%, oklch(52.28% 0.0123 22.22) 89.4%, oklch(48.22% 0.0123 33.75) 91.5%, oklch(44.41% 0.0124 44.42) 93.6%, oklch(41.02% 0.0124 53.91) 95.7%, oklch(38.24% 0.0124 61.91) 97.9%, oklch(36.22% 0.0124 68.10) 100.0%); }
         .light .glass { background: rgba(255,255,255,0.7); border-color: rgba(59,130,246,0.2); }
         .light .glass-card { background: rgba(255,255,255,0.8); border-color: rgba(59,130,246,0.15); }
         .light .glass-card:hover { box-shadow: 0 12px 40px rgba(59,130,246,0.1); }
@@ -414,7 +414,7 @@
             profile: {
                 name: 'S. Vikinesh',
                 tagline: 'Aspiring Software Engineer',
-                image: 'IMG_20260221_164230.jpg',
+                image: 'IMG-20261014-WA0022.jpg',
                 available: true,
                 status: 'Available for Internships',
                 about: [
@@ -910,9 +910,9 @@
                                 </div>
                             </div>
 
-                            <div className={`hidden lg:flex justify-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                            <div className={`flex justify-center order-first lg:order-none transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                                 <div className="relative animate-float">
-                                    <div className="w-72 h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10">
+                                    <div className="w-64 h-64 sm:w-72 sm:h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10">
                                         <img src={p.image || 'IMG_20260221_164230.jpg'} alt={p.name} className="w-full h-full object-cover" style={{ transform: Number(p.imageTilt) ? `rotate(${p.imageTilt}deg)` : undefined }} />
                                     </div>
                                     {heroStat.value && (
