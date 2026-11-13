@@ -910,9 +910,9 @@
                                 </div>
                             </div>
 
-                            <div className={`hidden lg:flex justify-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                            <div className={`flex justify-center order-first lg:order-none transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                                 <div className="relative animate-float">
-                                    <div className="w-72 h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10">
+                                    <div className="w-64 h-64 sm:w-72 sm:h-72 xl:w-80 xl:h-80 rounded-2xl overflow-hidden border-2 dark:border-primary/30 border-primary/20 shadow-2xl dark:shadow-primary/20 shadow-primary/10">
                                         <img src={p.image || 'IMG_20260221_164230.jpg'} alt={p.name} className="w-full h-full object-cover" style={{ transform: Number(p.imageTilt) ? `rotate(${p.imageTilt}deg)` : undefined }} />
                                     </div>
                                     {heroStat.value && (
