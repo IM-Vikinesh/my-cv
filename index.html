@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>S. Vikinesh | Aspiring Software Engineer</title>
-    <meta name="description" content="Portfolio of S. Vikinesh – Aspiring Software Engineer, Full-Stack Developer & AI Enthusiast. HNDIT student at ATI Sri Lanka." />
+    <meta name="description" content="Portfolio of S. Vikinesh â€“ Aspiring Software Engineer, Full-Stack Developer & AI Enthusiast. HNDIT student at ATI Sri Lanka." />
     <meta name="keywords" content="S. Vikinesh, software engineer, portfolio, full-stack developer, AI, React, Sri Lanka" />
     <meta property="og:title" content="S. Vikinesh | Aspiring Software Engineer" />
     <meta property="og:description" content="Building Intelligent Solutions for the Future" />
@@ -16,7 +16,7 @@
     <link id="fontBodyLink" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link id="fontHeadingLink" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>âš¡</text></svg>" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -243,7 +243,7 @@
             var ls = document.getElementById('loadingScreen');
             if (ls && !ls.classList.contains('hidden')) {
                 ls.classList.add('hidden');
-                document.getElementById('loadingMsg').textContent = 'Taking longer than expected — check your internet connection and reload.';
+                document.getElementById('loadingMsg').textContent = 'Taking longer than expected â€” check your internet connection and reload.';
             }
         }, 12000);
         // Global error handler
@@ -1393,16 +1393,16 @@
         // === ADMIN COMPONENTS ===
 
         // --- shared admin UI ---
-        const ADMIN_INPUT = 'w-full px-4 py-3 rounded-xl bg-white dark:bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm';
-        const ADMIN_CARD = 'rounded-xl p-5 bg-white/80 dark:bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-slate-200/70 dark:border-white/5';
+        const ADMIN_INPUT = 'w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm';
+        const ADMIN_CARD = 'rounded-xl p-5 bg-white/[0.03] border border-white/5';
         const ADMIN_CARD_BG = {};
 
         function AdminHeading({ title, subtitle, children }) {
             return (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 className="font-heading text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">{title}</h2>
-                        {subtitle && <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>}
+                        <h2 className="font-heading text-xl font-bold text-white">{title}</h2>
+                        {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
                     </div>
                     {children}
                 </div>
@@ -1411,10 +1411,10 @@
 
         function AdminSaveButton({ onClick, label = 'Save Changes', variant = '' }) {
             const extra = variant === 'danger'
-                ? 'bg-red-500 hover:bg-red-600 text-slate-900 dark:text-white'
+                ? 'bg-red-500 hover:bg-red-600 text-white'
                 : variant === 'ghost'
-                    ? 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-200 dark:bg-slate-800/60 dark:text-slate-700 dark:text-slate-300 dark:hover:bg-slate-300 dark:hover:bg-slate-700/60'
-                    : 'bg-gradient-to-r from-primary to-secondary text-slate-900 dark:text-white hover:shadow-lg hover:shadow-primary/30';
+                    ? 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                    : 'bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:shadow-primary/30';
             return (
                 <button onClick={onClick}
                     className={'px-5 py-2 rounded-xl font-semibold transition-all text-sm ' + extra}>
@@ -1426,7 +1426,7 @@
         function AdminField({ label, hint, children }) {
             return (
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300 mb-1">{label}</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{label}</label>
                     {children}
                     {hint && <p className="text-[11px] text-slate-500 mt-1">{hint}</p>}
                 </div>
@@ -1448,11 +1448,11 @@
             return (
                 <div className="flex items-start gap-3">
                     <button type="button" role="switch" aria-checked={!!checked} onClick={() => onChange(!checked)}
-                        className={'mt-0.5 w-11 h-6 rounded-full transition-colors flex-shrink-0 ' + (checked ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700')}>
+                        className={'mt-0.5 w-11 h-6 rounded-full transition-colors flex-shrink-0 ' + (checked ? 'bg-primary' : 'dark:bg-slate-700')}>
                         <span className={'block w-5 h-5 mt-0.5 rounded-full bg-white shadow transition-transform ' + (checked ? 'translate-x-[22px]' : 'translate-x-0.5')} />
                     </button>
                     <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{label}</p>
+                        <p className="text-sm font-medium dark:text-slate-200">{label}</p>
                         {hint && <p className="text-[11px] text-slate-500 mt-0.5">{hint}</p>}
                     </div>
                 </div>
@@ -1494,9 +1494,9 @@
 
         function AdminRow({ title, subtitle, children }) {
             return (
-                <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5">
+                <div className="flex items-center justify-between gap-4 p-3 rounded-xl dark:bg-white/[0.03]/[0.03] border border-slate-200/70 dark:border-white/5">
                     <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{title}</p>
+                        <p className="text-sm font-medium dark:text-slate-200 truncate">{title}</p>
                         {subtitle && <p className="text-[11px] text-slate-500 truncate">{subtitle}</p>}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">{children}</div>
@@ -1557,28 +1557,28 @@
                 }
             };
             return (
-                <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0F172A] p-4">
+                <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4">
                     <div className="glass-card rounded-2xl p-8 w-full max-w-md">
                         <div className="text-center mb-6">
-                            <h2 className="font-heading text-2xl font-bold text-slate-900 dark:text-white">Admin Panel</h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to manage your portfolio</p>
+                            <h2 className="font-heading text-2xl font-bold text-white">Admin Panel</h2>
+                            <p className="text-slate-400 text-sm mt-1">Sign in to manage your portfolio</p>
                         </div>
                         <form onSubmit={handle} className="space-y-4">
                             {err && <div className="text-red-400 text-sm bg-red-400/10 px-4 py-2 rounded-lg break-words">{err}</div>}
                             <input type="text" placeholder="Username" value={u} onChange={e => setU(e.target.value)} required
                                 autoComplete="username"
-                                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
+                                className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
                             <input type="password" placeholder="Password" value={p} onChange={e => setP(e.target.value)} required
                                 autoComplete="current-password"
-                                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
+                                className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-all text-sm" />
                             <button type="submit" disabled={busy}
-                                className="w-full py-3 rounded-xl text-slate-900 dark:text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60">
+                                className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60">
                                 {busy ? 'Signing in...' : 'Sign In'}
                             </button>
                         </form>
                         <div className="mt-6 text-center">
                             <button onClick={() => { window.location.hash = ''; }}
-                                className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+                                className="text-sm text-slate-400 hover:text-primary transition-colors">
                                 &larr; Back to Portfolio
                             </button>
                         </div>
@@ -1612,9 +1612,9 @@
             const sidebar = (
                 <div className="w-64 flex-shrink-0 glass rounded-2xl p-3 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
                     <div className="px-3 py-3 mb-2">
-                        <h3 className="font-heading font-bold text-slate-900 dark:text-white text-lg">Admin</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Portfolio Manager</p>
-                        <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-200 dark:border-slate-700/50"><SyncBadge sync={sync} /></div>
+                        <h3 className="font-heading font-bold text-white text-lg">Admin</h3>
+                        <p className="text-xs text-slate-400">Portfolio Manager</p>
+                        <div className="mt-2 pt-2 border-t border-slate-700/50"><SyncBadge sync={sync} /></div>
                     </div>
                     {sidebarItems.map(s => (
                         <button key={s.id} onClick={() => setSection(s.id)}
@@ -1623,7 +1623,7 @@
                             {s.label}
                         </button>
                     ))}
-                    <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-200 dark:border-slate-700/50 space-y-1">
+                    <div className="pt-3 mt-3 border-t border-slate-700/50 space-y-1">
                         <button onClick={() => { window.location.hash = ''; }}
                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 12H3m0 0l4-4m-4 4l4 4"/></svg>
@@ -1661,11 +1661,11 @@
             };
 
             return (
-                <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] flex p-4 gap-4">
+                <div className="min-h-screen bg-[#0F172A] flex p-4 gap-4">
                     <div className="hidden lg:block">{sidebar}</div>
                     <div className="flex-1 min-w-0 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
                         <div className="glass rounded-2xl p-4 sm:p-6">
-                            <div className="lg:hidden flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-200 dark:border-slate-700/50">
+                            <div className="lg:hidden flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-700/50">
                                 <SyncBadge sync={sync} />
                             </div>
                             <div className="lg:hidden flex gap-2 mb-4 overflow-x-auto pb-2">
@@ -1802,7 +1802,7 @@
                         <AdminField label="Page Title" hint="Shown in the browser tab.">
                             <AdminInput value={form.title} onChange={set('title')} />
                         </AdminField>
-                        <AdminField label="Meta Description" hint="Aim for 150–160 characters.">
+                        <AdminField label="Meta Description" hint="Aim for 150â€“160 characters.">
                             <AdminTextarea value={form.description} onChange={set('description')} rows={3} />
                         </AdminField>
                         <AdminField label="Keywords" hint="Comma separated.">
@@ -1996,7 +1996,7 @@
                     {items.length === 0 && <p className="text-sm text-slate-500 dark:text-slate-400">No stats yet.</p>}
                     <div className="space-y-2">
                         {items.map((s, i) => (
-                            <AdminRow key={i} title={`${s.value} — ${s.label}`} subtitle={s.icon ? 'Custom icon' : 'No icon'}>
+                            <AdminRow key={i} title={`${s.value} â€” ${s.label}`} subtitle={s.icon ? 'Custom icon' : 'No icon'}>
                                 <AdminPillButton tone="blue" onClick={() => { setEditing({ ...s, _idx: i }); setShowForm(true); }}>Edit</AdminPillButton>
                                 <AdminPillButton tone="red" onClick={() => del(i)}>Del</AdminPillButton>
                             </AdminRow>
@@ -2634,7 +2634,7 @@
                                         <AdminTextarea value={editing.path || ''} onChange={v => setEditing(e => ({ ...e, path: v }))} rows={4} mono />
                                     </AdminField>
                                 )}
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5">
+                                <div className="flex items-center gap-3 p-3 rounded-xl dark:bg-white/[0.03]/[0.03] border border-slate-200/70 dark:border-white/5">
                                     <span className="text-xs text-slate-500 dark:text-slate-400">Preview</span>
                                     <a href="javascript:void(0)" onClick={e => e.preventDefault()}
                                         className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300">
@@ -3067,14 +3067,14 @@
                         <div className="space-y-3">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div className="min-w-0">
-                                    <p className="text-sm text-slate-800 dark:text-slate-200">Clear browser data</p>
+                                    <p className="text-sm dark:text-slate-200">Clear browser data</p>
                                     <p className="text-[11px] text-slate-500">Discards this browser's saved copy so the file's baked-in defaults are used.</p>
                                 </div>
                                 <AdminSaveButton variant="ghost" label="Clear" onClick={clearOverride} />
                             </div>
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div className="min-w-0">
-                                    <p className="text-sm text-slate-800 dark:text-slate-200">Reset all content</p>
+                                    <p className="text-sm dark:text-slate-200">Reset all content</p>
                                     <p className="text-[11px] text-slate-500">Restores every section to the original defaults.</p>
                                 </div>
                                 <AdminSaveButton variant="danger" label="Reset to Defaults" onClick={resetDefaults} />
@@ -3384,6 +3384,10 @@
                 window.addEventListener('hashchange', onHash);
                 return () => window.removeEventListener('hashchange', onHash);
             }, []);
+
+            useEffect(() => {
+                if (page === 'admin-login' || page === 'admin-dashboard') setTheme('dark');
+            }, [page]);
 
             const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), []);
             const handleLogin = () => { window.location.hash = 'admin/dashboard'; };
